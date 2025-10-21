@@ -13,6 +13,8 @@ import androidx.core.view.WindowInsetsCompat;
 
 public class splashscreen extends AppCompatActivity {
 
+    private VideoView valVideo;
+
 
 
     @Override
@@ -20,8 +22,7 @@ public class splashscreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_splashscreen);
-
-      VideoView valVideo=findViewById(R.id.Splash);
+        valVideo=findViewById(R.id.Splash);
       Uri videopath=Uri.parse("android.resource://"+getPackageName()+"/"+R.raw.splash_screen);
         valVideo.setVideoURI(videopath);
 

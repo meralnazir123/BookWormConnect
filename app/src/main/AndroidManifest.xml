@@ -13,6 +13,12 @@
         android:theme="@style/Theme.BookWormConnect"
         tools:targetApi="31">
         <activity
+            android:name=".HomeActivity"
+            android:exported="false" />
+        <activity
+            android:name=".LoginActivity"
+            android:exported="false" />
+        <activity
             android:name=".splashscreen"
             android:exported="true">
             <intent-filter>

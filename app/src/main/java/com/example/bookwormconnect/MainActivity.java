@@ -87,7 +87,7 @@ public class MainActivity extends AppCompatActivity {
                                         databaseReference.child(user.getUid()).child("email").setValue(email);
                                     }
                                     Toast.makeText(MainActivity.this,"Registered Successfully!", Toast.LENGTH_SHORT).show();
-                                    startActivity(new Intent(MainActivity.this, LoginActivity.class));
+                                    startActivity(new Intent(MainActivity.this,HomeActivity.class));
                                     finish();
                                 } else {
                                     Toast.makeText(MainActivity.this,  "Registration failed: " +

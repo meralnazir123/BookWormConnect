@@ -4,7 +4,6 @@
     xmlns:tools="http://schemas.android.com/tools"
     tools:showIn="nav_view"
     xmlns:app="http://schemas.android.com/apk/res-auto">
-
     <group
         android:checkableBehavior="single"/>
     <item
@@ -12,31 +11,26 @@
         android:icon="@drawable/profile"
         android:title="Profile"
         />
-
     <item
         android:id="@+id/MyBooks"
         android:icon="@drawable/books"
         android:title="My Books"
         />
-
     <item
         android:id="@+id/chat"
         android:icon="@drawable/chat"
-        android:title="Chat"
+        android:title="Chat List"
         />
-
     <item
         android:id="@+id/cat"
         android:icon="@drawable/categories"
         android:title="Categories"
         />
-
     <item
         android:id="@+id/setting"
         android:icon="@drawable/setting"
         android:title="Settings"
         />
-
     <item
         android:id="@+id/logout"
         android:icon="@drawable/logout"

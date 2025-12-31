@@ -12,6 +12,13 @@ import android.view.ViewGroup;
 public class profileFragment extends Fragment {
 
     @Override
+    public void onResume() {
+        super.onResume();
+        ((HomeActivity) requireActivity()).hideSearchBar();
+        ((HomeActivity) requireActivity()).hideCamera();
+    }
+
+    @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment

@@ -1,13 +1,13 @@
 package com.example.bookwormconnect;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ImageView;
+import android.widget.ImageButton;
 import android.widget.Toast;
-
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
@@ -21,69 +21,94 @@ import androidx.drawerlayout.widget.DrawerLayout;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
-import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.navigation.NavigationView;
-import com.google.firebase.Firebase;
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.FirebaseStorage;
-import com.google.firebase.storage.StorageReference;
-
-import java.io.ByteArrayOutputStream;
+import com.google.firebase.firestore.Query;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.List;
 
-public class HomeActivity extends AppCompatActivity {
-
-    ImageView Camera;
+public class HomeActivity extends AppCompatActivity{
+    ImageButton Camera;
     RecyclerView recyclerView;
-    ArrayList<String> imageList;
-    ImageAdapter adapter;
+    ArrayList<postEntity> postList;
+    postAdapter adapter;
     FirebaseFirestore firestore;
-
-
-
-    ActivityResultLauncher<Intent> cameraLauncher;
-
+    SearchView searchView;
+    ActivityResultLauncher<Intent> imagePickerLauncher;
+    ActivityResultLauncher<String> cameraPermissionLauncher;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        loadImages();
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_home);
+
+        searchView=findViewById(R.id.searchView);
         Camera=findViewById(R.id.camera);
         recyclerView=findViewById(R.id.RecyclerV);
-        imageList=new ArrayList<>();
 
-        recyclerView.setLayoutManager(new GridLayoutManager(this, 2));
-        adapter=new ImageAdapter(imageList);
+        postList=new ArrayList<>();
+        adapter=new postAdapter(postList);
+        recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
-       firestore =FirebaseFirestore.getInstance();
+        firestore =FirebaseFirestore.getInstance();
 
-
-        cameraLauncher=registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
+        cameraPermissionLauncher =
+                registerForActivityResult(
+                        new ActivityResultContracts.RequestPermission(),
+                        isGranted -> {
+                            if (isGranted) {
+                                openCameraChooser();
+                            } else {
+                                Toast.makeText(this,
+                                        "Camera permission required",
+                                        Toast.LENGTH_SHORT).show();
+                            }
+                        }
+                );
+        imagePickerLauncher=registerForActivityResult(new ActivityResultContracts.StartActivityForResult(),
                 result-> {
-            if(result.getResultCode()==RESULT_OK){
-                Bitmap bitmap=(Bitmap) result.getData().getExtras().get("data");
-                uploadImage(bitmap);
-            }
+                    if(result.getResultCode()==RESULT_OK && result.getData()!=null){
+                        Bitmap bitmap=null;
+                        if (result.getData().getData() != null) {
+                            try {
+                                bitmap = MediaStore.Images.Media.getBitmap(
+                                        this.getContentResolver(),
+                                        result.getData().getData()
+                                );
+                            } catch (Exception e) {
+                                e.printStackTrace();
+                            }
+                        } else if (result.getData().getExtras() != null) {
+                             bitmap=(Bitmap) result.getData().getExtras().get("data");
+                        }
+                        if (bitmap!=null)
+                            fetchUsernameAndUpload(bitmap);
+                    }
                 });
 
-        Camera.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent=new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
-                cameraLauncher.launch(intent);
+        Camera.setOnClickListener(v -> {
+            if (checkSelfPermission(android.Manifest.permission.CAMERA)
+                    == PackageManager.PERMISSION_GRANTED) {
+
+                openCameraChooser();
+
+            } else {
+                cameraPermissionLauncher.launch(android.Manifest.permission.CAMERA);
             }
         });
-
 
         DrawerLayout drawer=findViewById(R.id.drawerlayout);
         Toolbar toolbar=findViewById(R.id.toolbar);
         NavigationView navigationView=findViewById(R.id.navD);
-        SearchView searchView=findViewById(R.id.searchView);
         searchView.clearFocus();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -110,6 +135,11 @@ public class HomeActivity extends AppCompatActivity {
                 }else if(id==R.id.MyBooks){
                     loadFragment(new MybooksFragment());
                 }
+                else if(id==R.id.home){
+                    Intent intent = new Intent(HomeActivity.this, HomeActivity.class);
+                    startActivity(intent);
+                    finish();
+                }
                 else if(id==R.id.chat){
                     loadFragment(new ChatlistFragment());
                 }
@@ -126,66 +156,119 @@ public class HomeActivity extends AppCompatActivity {
                 return true;
             }
         });
+
+        loadFromRoom();
+
+    }
+
+    private void openCameraChooser() {
+        Intent cameraIntent = new Intent(MediaStore.ACTION_IMAGE_CAPTURE);
+
+        Intent galleryIntent = new Intent(
+                Intent.ACTION_PICK,
+                MediaStore.Images.Media.EXTERNAL_CONTENT_URI
+        );
+
+        Intent chooser = Intent.createChooser(galleryIntent, "Select Image");
+        chooser.putExtra(Intent.EXTRA_INITIAL_INTENTS,
+                new Intent[]{cameraIntent});
+
+        imagePickerLauncher.launch(chooser);
+
+    }
+
+    private void fetchUsernameAndUpload(Bitmap bitmap) {
+
+        String uid = FirebaseAuth.getInstance().getUid();
+
+        if (uid == null) {
+            Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        DatabaseReference userRef = FirebaseDatabase.getInstance()
+                .getReference("users")
+                .child(uid);
+
+        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot snapshot) {
+
+                if (snapshot.exists()) {
+                    String username = snapshot.child("username").getValue(String.class);
+
+                    if (username != null) {
+
+                            TempPostHolder.username = username;
+                            TempPostHolder.bitmap=bitmap;
+
+                            startActivity(
+                                    new Intent(HomeActivity.this, PostDetailActivity.class)
+                            );
+                    } else {
+                        Toast.makeText(HomeActivity.this,
+                                "Username field missing",
+                                Toast.LENGTH_SHORT).show();
+                    }
+
+                } else {
+                    Toast.makeText(HomeActivity.this,
+                            "User record not found",
+                            Toast.LENGTH_SHORT).show();
+                }
+            }
+            
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+                Toast.makeText(HomeActivity.this,
+                        error.getMessage(),
+                        Toast.LENGTH_SHORT).show();
+            }
+        });
     }
 
     private void loadImages() {
-        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-
-        firestore.collection("images")
-                .orderBy("time")
+        FirebaseFirestore.getInstance()
+        .collection("posts")
+                .orderBy("time", Query.Direction.DESCENDING)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
 
-                    imageList.clear();
-
+                    postList.clear();
                     for (DocumentSnapshot doc : queryDocumentSnapshots) {
-                        String url = doc.getString("url");
-                        imageList.add(url);
-                    }
+                        postmodel post = doc.toObject(postmodel.class);
+                        postEntity entity = new postEntity();
+                        entity.imageUrl = post.getUrl();
+                        entity.username = post.getUsername();
+                        entity.bookType = post.getBookType();
+                        entity.description = post.getDescription();
+                        entity.time = post.getTime();
 
-                    adapter.notifyDataSetChanged();
+                        AppDatabase.getInstance(this).postDao().insert(entity);
+                        postList.add(entity);
+                    }
+                        adapter.notifyDataSetChanged();
+                  loadFromRoom();
                 })
                 .addOnFailureListener(e ->
                         Toast.makeText(this,
-                                "Failed to load images",
+                                "Failed to load posts",
                                 Toast.LENGTH_SHORT).show());
     }
 
-    private void uploadImage(Bitmap bitmap) {
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        StorageReference storageRef = storage.getReference();
+    private void loadFromRoom() {
 
-        FirebaseFirestore firestore = FirebaseFirestore.getInstance();
+     List<postEntity> roomPosts =
+             AppDatabase.getInstance(this)
+                     .postDao()
+                     .getAllPosts();
 
-        ByteArrayOutputStream baos=new ByteArrayOutputStream();
-        bitmap.compress(Bitmap.CompressFormat.JPEG, 100, baos);
-        byte[] data= baos.toByteArray();
+            postList.clear();
 
-        StorageReference imageRef =
-                storageRef.child("images/" + System.currentTimeMillis() + ".jpg");
+        postList.addAll(roomPosts);
 
-        imageRef.putBytes(data).addOnSuccessListener(taskSnapshot ->
-                imageRef.getDownloadUrl().addOnSuccessListener(uri -> {
-
-                    Map<String, Object> imageData = new HashMap<>();
-                    imageData.put("url", uri.toString());
-                    imageData.put("time", System.currentTimeMillis());
-
-                    firestore.collection("images")
-                                    .add(imageData).addOnSuccessListener(doc ->{
-                                imageList.add(uri.toString());
-                                adapter.notifyItemInserted(imageList.size()-1);
-                            });
-                    Toast.makeText(this,
-                            "Image uploaded",
-                            Toast.LENGTH_SHORT).show();
-
-                }))
-                .addOnFailureListener(e -> {
-                    Toast.makeText(this,"Firestore Failed",Toast.LENGTH_SHORT).show();
-    });
+        adapter.notifyDataSetChanged();
     }
-
     private void filterText(String newText) {
     }
 
@@ -202,7 +285,19 @@ public class HomeActivity extends AppCompatActivity {
     private void loadFragment(Fragment fragment) {
         FragmentManager fm=getSupportFragmentManager();
         FragmentTransaction ft=fm.beginTransaction();
-        ft.add(R.id.frame,fragment);
+        ft.replace(R.id.frame,fragment);
+        ft.addToBackStack(null);
         ft.commit();
+    }
+    public void hideSearchBar() {
+        searchView.setVisibility(View.GONE);
+    }
+    public void hideCamera() {
+        Camera.setVisibility(View.GONE);
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+        loadFromRoom();
     }
 }

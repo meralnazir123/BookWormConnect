@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout
+
+    android:orientation="vertical"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="@drawable/background1"
+    tools:context=".PostDetailActivity">
+
+    <TextView
+
+        android:id="@+id/postdetailTV"
+        android:layout_width="wrap_content"
+        android:layout_height="62dp"
+        android:layout_gravity="center"
+        android:text="Add Post Details"
+        android:textColor="#fff3c2"
+        android:textSize="33sp"
+        android:layout_marginTop="50dp"/>
+
+    <TextView
+        android:id="@+id/bookType"
+        android:layout_marginLeft="20sp"
+        android:layout_marginTop="50dp"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Select Book Type"
+        android:textColor="#fff3c2"
+        android:textSize="16sp"
+        android:textStyle="bold" />
+
+    <Spinner
+        android:id="@+id/bookTypeSpinner"
+        android:layout_width="match_parent"
+        android:layout_height="49dp"
+        android:layout_marginTop="12dp"
+        android:textColor="#fff3c2">
+
+    </Spinner>
+
+    <EditText
+
+        android:id="@+id/etDescription"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:hint="Write something about the book..."
+        android:inputType="textMultiLine"
+        android:minLines="3"
+        android:textColor="#fff3c2"
+        tools:ignore="HardcodedText" />
+
+    <Button
+        android:id="@+id/postButton"
+        android:layout_width="112dp"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="188dp"
+        android:backgroundTint="#fff3c2"
+        android:text="Post"
+        android:textColor="@color/black" />
+
+</LinearLayout>

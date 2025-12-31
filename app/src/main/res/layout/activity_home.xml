@@ -10,41 +10,14 @@
     android:background="@drawable/background1"
     tools:openDrawer="start"
     android:fitsSystemWindows="true">
-
-    <include layout="@layout/toolbar_home"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-    </include>
+    
     <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
+        android:layout_height="match_parent"
         android:orientation="vertical">
 
-        <androidx.appcompat.widget.SearchView
-            android:id="@+id/searchView"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="54dp"
-            app:iconifiedByDefault="false"
-            app:queryHint="Search your Book..." />
+    <include layout="@layout/toolbar_home"/>
 
-
-        <androidx.recyclerview.widget.RecyclerView
-            android:id="@+id/RecyclerV"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:layout_weight="1">
-        </androidx.recyclerview.widget.RecyclerView>
-
-        <ImageButton
-            android:id="@+id/camera"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_gravity="bottom|center"
-            android:background="@null"
-            android:src="@drawable/camera">
-
-        </ImageButton>
     </LinearLayout>
 
     <com.google.android.material.navigation.NavigationView
@@ -54,8 +27,5 @@
         android:layout_gravity="start"
         android:fitsSystemWindows="true"
         app:menu="@menu/nav_menu">
-
-    </com.google.android.material.navigation.NavigationView>
-
-
+          </com.google.android.material.navigation.NavigationView>
 </androidx.drawerlayout.widget.DrawerLayout>

@@ -10,6 +10,13 @@ import android.view.ViewGroup;
 
 public class MybooksFragment extends Fragment {
 
+    @Override
+    public void onResume() {
+        super.onResume();
+        ((HomeActivity) requireActivity()).hideSearchBar();
+        ((HomeActivity) requireActivity()).hideCamera();
+
+    }
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,

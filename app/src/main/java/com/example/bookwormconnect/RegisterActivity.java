@@ -3,7 +3,6 @@ package com.example.bookwormconnect;
 import android.content.Intent;
 import android.os.Bundle;
 
-import android.provider.ContactsContract;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -11,22 +10,15 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.EdgeToEdge;
-import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.auth.TotpSecret;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 
-import java.util.HashMap;
-
-public class MainActivity extends AppCompatActivity {
+public class RegisterActivity extends AppCompatActivity {
 
     EditText etemail, etusername, etpassword, etcpassword;
     TextView login;
@@ -39,7 +31,7 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         EdgeToEdge.enable(this);
-        setContentView(R.layout.activity_main);
+        setContentView(R.layout.register_activity);
         etemail = findViewById(R.id.mail);
         etusername = findViewById(R.id.usern);
         etpassword = findViewById(R.id.pwd);
@@ -51,7 +43,7 @@ public class MainActivity extends AppCompatActivity {
         login.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                Intent intent = new Intent(RegisterActivity.this, LoginActivity.class);
                 startActivity(intent);
                 finish();
             }
@@ -69,12 +61,11 @@ public class MainActivity extends AppCompatActivity {
 
 
                 if (email.isEmpty() || username.isEmpty() || password.isEmpty() || cpassword.isEmpty()) {
-                    Toast.makeText(MainActivity.this, "Please fill all fields", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(RegisterActivity.this, "Please fill all fields", Toast.LENGTH_SHORT).show();
                     return;
                 }
                 if (!password.equals(cpassword)) {
-                    Toast.makeText(MainActivity.this, "Passwords do not match", Toast.LENGTH_SHORT).show();
-                    return;
+                    Toast.makeText(RegisterActivity.this, "Passwords do not match", Toast.LENGTH_SHORT).show();
                 }else {
 
                     mAuth.createUserWithEmailAndPassword(email, password)
@@ -86,11 +77,11 @@ public class MainActivity extends AppCompatActivity {
                                         databaseReference.child(user.getUid()).child("username").setValue(username);
                                         databaseReference.child(user.getUid()).child("email").setValue(email);
                                     }
-                                    Toast.makeText(MainActivity.this,"Registered Successfully!", Toast.LENGTH_SHORT).show();
-                                    startActivity(new Intent(MainActivity.this,HomeActivity.class));
+                                    Toast.makeText(RegisterActivity.this,"Registered Successfully!", Toast.LENGTH_SHORT).show();
+                                    startActivity(new Intent(RegisterActivity.this,HomeActivity.class));
                                     finish();
                                 } else {
-                                    Toast.makeText(MainActivity.this,  "Registration failed: " +
+                                    Toast.makeText(RegisterActivity.this,  "Registration failed: " +
                                             task.getException().getMessage(), Toast.LENGTH_LONG).show();
                                 }
                             });
@@ -101,4 +92,4 @@ public class MainActivity extends AppCompatActivity {
                         });
 
                 }
-            }
+}

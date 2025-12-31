@@ -64,12 +64,12 @@ public class LoginActivity extends AppCompatActivity {
 
         loadLoginPreferences();
         registerTV.setOnClickListener(v -> {
-            Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
             startActivity(intent);
             finish();
         });
 
-        
+
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override

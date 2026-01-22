@@ -1,3 +1,4 @@
+
 package com.example.bookwormconnect;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -88,7 +89,7 @@ public class HomeActivity extends AppCompatActivity{
                                 e.printStackTrace();
                             }
                         } else if (result.getData().getExtras() != null) {
-                             bitmap=(Bitmap) result.getData().getExtras().get("data");
+                            bitmap=(Bitmap) result.getData().getExtras().get("data");
                         }
                         if (bitmap!=null)
                             fetchUsernameAndUpload(bitmap);
@@ -149,8 +150,13 @@ public class HomeActivity extends AppCompatActivity{
                 else if(id==R.id.setting){
                     loadFragment(new settingFragment());
                 }
-                else{  //logout
-                    startActivity(new Intent(HomeActivity.this,LoginActivity.class));
+                else if(id==R.id.logout){
+                    FirebaseAuth.getInstance().signOut();
+
+                    Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
+                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                    startActivity(intent);
+                    finish();
                 }
                 drawer.closeDrawer(GravityCompat.START);
                 return true;
@@ -199,12 +205,12 @@ public class HomeActivity extends AppCompatActivity{
 
                     if (username != null) {
 
-                            TempPostHolder.username = username;
-                            TempPostHolder.bitmap=bitmap;
+                        TempPostHolder.username = username;
+                        TempPostHolder.bitmap=bitmap;
 
-                            startActivity(
-                                    new Intent(HomeActivity.this, PostDetailActivity.class)
-                            );
+                        startActivity(
+                                new Intent(HomeActivity.this, PostDetailActivity.class)
+                        );
                     } else {
                         Toast.makeText(HomeActivity.this,
                                 "Username field missing",
@@ -217,7 +223,7 @@ public class HomeActivity extends AppCompatActivity{
                             Toast.LENGTH_SHORT).show();
                 }
             }
-            
+
             @Override
             public void onCancelled(@NonNull DatabaseError error) {
                 Toast.makeText(HomeActivity.this,
@@ -229,26 +235,27 @@ public class HomeActivity extends AppCompatActivity{
 
     private void loadImages() {
         FirebaseFirestore.getInstance()
-        .collection("posts")
+                .collection("posts")
                 .orderBy("time", Query.Direction.DESCENDING)
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
 
+                    PostDao postDao = AppDatabase.getInstance(this).postDao();
+                    postDao.deleteAll();
+
                     postList.clear();
                     for (DocumentSnapshot doc : queryDocumentSnapshots) {
-                        postmodel post = doc.toObject(postmodel.class);
                         postEntity entity = new postEntity();
-                        entity.imageUrl = post.getUrl();
-                        entity.username = post.getUsername();
-                        entity.bookType = post.getBookType();
-                        entity.description = post.getDescription();
-                        entity.time = post.getTime();
-
-                        AppDatabase.getInstance(this).postDao().insert(entity);
+                        entity.imageUrl = doc.getString("url");
+                        entity.username = doc.getString("username");
+                        entity.bookType = doc.getString("bookType");
+                        entity.description = doc.getString("description");
+                        entity.time = doc.getLong("time");
+                        PostDao.insert(entity);
                         postList.add(entity);
                     }
-                        adapter.notifyDataSetChanged();
-                  loadFromRoom();
+                    adapter.notifyDataSetChanged();
+                    loadFromRoom();
                 })
                 .addOnFailureListener(e ->
                         Toast.makeText(this,
@@ -258,12 +265,16 @@ public class HomeActivity extends AppCompatActivity{
 
     private void loadFromRoom() {
 
-     List<postEntity> roomPosts =
-             AppDatabase.getInstance(this)
-                     .postDao()
-                     .getAllPosts();
+        List<postEntity> roomPosts =
+                AppDatabase.getInstance(this)
+                        .postDao()
+                        .getAllPosts();
+        if (roomPosts == null || roomPosts.isEmpty()) {
+            loadImages();
+            return;
+        }
 
-            postList.clear();
+        postList.clear();
 
         postList.addAll(roomPosts);
 

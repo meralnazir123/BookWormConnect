@@ -26,11 +26,38 @@
         android:icon="@drawable/chat"
         android:title="Chat List"
         />
+
+
     <item
         android:id="@+id/cat"
         android:icon="@drawable/categories"
-        android:title="Categories"
-        />
+        android:title="Categories">
+
+        <menu>
+            <item
+                android:id="@+id/novels"
+                android:title="Novels"/>
+
+            <item
+                android:id="@+id/textbooks"
+                android:title="TextBooks"
+                />
+
+            <item
+                android:id="@+id/others"
+                android:title="Others"
+                />
+
+        </menu>
+
+    </item>
+
+    <item
+        android:id="@+id/divider"
+        android:enabled="false"
+        app:actionLayout="@layout/divider">
+
+    </item>
     <item
         android:id="@+id/setting"
         android:icon="@drawable/setting"

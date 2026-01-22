@@ -10,6 +10,7 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
@@ -93,12 +94,14 @@ public class PostDetailActivity extends AppCompatActivity {
                     postEntity entity = new postEntity();
                     entity.imageUrl = imageUrl;
                     entity.username = TempPostHolder.username;
+                    post.put("userId", FirebaseAuth.getInstance().getUid());
                     entity.bookType = bookType;
                     entity.description = description;
                     entity.time = System.currentTimeMillis();
 
                     AppDatabase.getInstance(this)
-                            .postDao()
+                            .postDao();
+                    PostDao
                             .insert(entity);
 
                     TempPostHolder.bitmap = null;

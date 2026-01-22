@@ -11,7 +11,9 @@ import java.util.List;
 public interface PostDao {
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    void insert(postEntity post);
+    static void insert(postEntity post) {
+
+    }
 
     @Query("SELECT * FROM posts ORDER BY time DESC")
     List<postEntity> getAllPosts();

@@ -7,12 +7,11 @@ import androidx.room.RoomDatabase;
 
 import androidx.room.Database;
 
-@Database(entities = {postEntity.class}, version = 1)
+@Database(entities = {}, version = 1)
 public abstract class AppDatabase extends RoomDatabase{
 
     private static AppDatabase instance;
 
-    public abstract PostDao postDao();
 
     public static synchronized AppDatabase getInstance(Context context) {
         if (instance == null) {

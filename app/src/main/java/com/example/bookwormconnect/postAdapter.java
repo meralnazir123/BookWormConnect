@@ -5,7 +5,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
-import android.widget.Spinner;
 import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
@@ -14,9 +13,9 @@ import java.util.List;
 
 public class postAdapter extends RecyclerView.Adapter<postAdapter.PostViewHolder> {
 
-    private List<postEntity> postList;
+    private List<postmodel> postList;
 
-    public postAdapter(List<postEntity> postList){
+    public postAdapter(List<postmodel> postList){
         this.postList=postList;
     }
     @NonNull
@@ -32,14 +31,14 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.PostViewHolder
     @Override
     public void onBindViewHolder(@NonNull PostViewHolder holder, int position) {
 
-        postEntity post = postList.get(position);
+        postmodel post = postList.get(position);
 
         holder.username.setText(post.username);
         holder.bookType.setText(post.bookType);
         holder.description.setText(post.description);
 
-        Glide.with(holder.postImage.getContext())
-                .load(post.imageUrl)
+        Glide.with(holder.itemView.getContext())
+                .load(post.getImageUrl())
                 .into(holder.postImage);
 
         holder.description.setText(

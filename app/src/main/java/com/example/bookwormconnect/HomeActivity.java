@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.provider.MediaStore;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
@@ -40,7 +41,7 @@ import java.util.List;
 public class HomeActivity extends AppCompatActivity{
     ImageButton Camera;
     RecyclerView recyclerView;
-    ArrayList<postEntity> postList;
+    ArrayList<postmodel> postList;
     postAdapter adapter;
     FirebaseFirestore firestore;
     SearchView searchView;
@@ -61,6 +62,8 @@ public class HomeActivity extends AppCompatActivity{
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
         firestore =FirebaseFirestore.getInstance();
+
+        loadImages();
 
         cameraPermissionLauncher =
                 registerForActivityResult(
@@ -128,42 +131,60 @@ public class HomeActivity extends AppCompatActivity{
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
+
+            Fragment fragment=null;
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id=item.getItemId();
                 if(id==R.id.profile){
                     loadFragment(new profileFragment());
-                }else if(id==R.id.MyBooks){
+                }
+                else if(id==R.id.MyBooks){
                     loadFragment(new MybooksFragment());
                 }
+                else if (id==R.id.novels) {
+                    fragment = CategoriesFragment.newInstance("Novel");
+                }
+
+                else if (id==R.id.textbooks) {
+                    fragment = CategoriesFragment.newInstance("Text Book");
+                }
+
                 else if(id==R.id.home){
                     Intent intent = new Intent(HomeActivity.this, HomeActivity.class);
                     startActivity(intent);
                     finish();
                 }
+
                 else if(id==R.id.chat){
                     loadFragment(new ChatlistFragment());
                 }
-                else if(id==R.id.cat){
-                    loadFragment(new CategoriesFragment());
-                }
+
                 else if(id==R.id.setting){
                     loadFragment(new settingFragment());
                 }
+
                 else if(id==R.id.logout){
                     FirebaseAuth.getInstance().signOut();
-
                     Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
                     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
                     startActivity(intent);
                     finish();
                 }
+                if (fragment != null) {
+                    FrameLayout frame = findViewById(R.id.frame);
+                    frame.removeAllViews();
+
+                    getSupportFragmentManager()
+                            .beginTransaction()
+                            .replace(R.id.frame, fragment)
+                            .addToBackStack(null)
+                            .commit();
+                }
                 drawer.closeDrawer(GravityCompat.START);
                 return true;
             }
         });
-
-        loadFromRoom();
 
     }
 
@@ -240,22 +261,18 @@ public class HomeActivity extends AppCompatActivity{
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
 
-                    PostDao postDao = AppDatabase.getInstance(this).postDao();
-                    postDao.deleteAll();
-
                     postList.clear();
                     for (DocumentSnapshot doc : queryDocumentSnapshots) {
-                        postEntity entity = new postEntity();
-                        entity.imageUrl = doc.getString("url");
-                        entity.username = doc.getString("username");
-                        entity.bookType = doc.getString("bookType");
-                        entity.description = doc.getString("description");
-                        entity.time = doc.getLong("time");
-                        PostDao.insert(entity);
-                        postList.add(entity);
+                        postmodel post = new postmodel();
+                        post.url = doc.getString("url");
+                        post.username = doc.getString("username");
+                        post.bookType = doc.getString("bookType");
+                        post.description = doc.getString("description");
+                        post.time = doc.getLong("time");
+                        postList.add(post);
                     }
                     adapter.notifyDataSetChanged();
-                    loadFromRoom();
+
                 })
                 .addOnFailureListener(e ->
                         Toast.makeText(this,
@@ -263,23 +280,7 @@ public class HomeActivity extends AppCompatActivity{
                                 Toast.LENGTH_SHORT).show());
     }
 
-    private void loadFromRoom() {
 
-        List<postEntity> roomPosts =
-                AppDatabase.getInstance(this)
-                        .postDao()
-                        .getAllPosts();
-        if (roomPosts == null || roomPosts.isEmpty()) {
-            loadImages();
-            return;
-        }
-
-        postList.clear();
-
-        postList.addAll(roomPosts);
-
-        adapter.notifyDataSetChanged();
-    }
     private void filterText(String newText) {
     }
 
@@ -309,6 +310,6 @@ public class HomeActivity extends AppCompatActivity{
     @Override
     protected void onResume() {
         super.onResume();
-        loadFromRoom();
+
     }
 }

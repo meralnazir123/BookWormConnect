@@ -42,8 +42,6 @@ dependencies {
     implementation(libs.firebase.database)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage)
-    implementation ("androidx.room:room-runtime:2.8.4")
-    annotationProcessor ("androidx.room:room-compiler:2.8.4")
     implementation (libs.glide)
     implementation(libs.room.common.jvm)
     implementation(libs.room.runtime.android)

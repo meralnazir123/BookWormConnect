@@ -27,13 +27,18 @@
         android:title="Chat List"
         />
 
+    <item
+        android:id="@+id/divider1"
+        android:enabled="false"
+        app:actionLayout="@layout/divider"
+        tools:ignore="MenuTitle">
 
+    </item>
     <item
         android:id="@+id/cat"
         android:icon="@drawable/categories"
-        android:title="Categories">
+        android:title="Categories"/>
 
-        <menu>
             <item
                 android:id="@+id/novels"
                 android:title="Novels"/>
@@ -42,20 +47,11 @@
                 android:id="@+id/textbooks"
                 android:title="TextBooks"
                 />
-
-            <item
-                android:id="@+id/others"
-                android:title="Others"
-                />
-
-        </menu>
-
-    </item>
-
     <item
-        android:id="@+id/divider"
+        android:id="@+id/divider2"
         android:enabled="false"
-        app:actionLayout="@layout/divider">
+        app:actionLayout="@layout/divider"
+        tools:ignore="MenuTitle">
 
     </item>
     <item

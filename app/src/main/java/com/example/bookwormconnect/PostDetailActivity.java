@@ -91,18 +91,13 @@ public class PostDetailActivity extends AppCompatActivity {
                 .add(post)
                 .addOnSuccessListener(doc -> {
 
-                    postEntity entity = new postEntity();
-                    entity.imageUrl = imageUrl;
+                    postmodel entity = new postmodel();
+                    entity.url = imageUrl;
                     entity.username = TempPostHolder.username;
                     post.put("userId", FirebaseAuth.getInstance().getUid());
                     entity.bookType = bookType;
                     entity.description = description;
                     entity.time = System.currentTimeMillis();
-
-                    AppDatabase.getInstance(this)
-                            .postDao();
-                    PostDao
-                            .insert(entity);
 
                     TempPostHolder.bitmap = null;
                     TempPostHolder.username = null;

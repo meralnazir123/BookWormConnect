@@ -1,11 +1,19 @@
 package com.example.bookwormconnect;
+
+import androidx.room.Entity;
+import androidx.room.PrimaryKey;
+
+@Entity(tableName = "posts")
 public class postmodel {
+
+    @PrimaryKey(autoGenerate = true)
+    public int id;
 
     public String url;
     public String username;
     String bookType;
     String description;
-    private long time;
+    public long time;
 
     public postmodel() {}
 
@@ -18,7 +26,7 @@ public class postmodel {
         this.bookType=bookType;
         this.description=description;
     }
-    public String getUrl() {
+    public String getImageUrl() {
         return url;
     }
 

@@ -45,6 +45,7 @@ dependencies {
     implementation (libs.glide)
     implementation(libs.room.common.jvm)
     implementation(libs.room.runtime.android)
+    implementation(libs.mediation.test.suite)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)

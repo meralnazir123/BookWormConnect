@@ -67,7 +67,6 @@ public class RegisterActivity extends AppCompatActivity {
                 if (!password.equals(cpassword)) {
                     Toast.makeText(RegisterActivity.this, "Passwords do not match", Toast.LENGTH_SHORT).show();
                 }
-
                 else {
 
                     mAuth.createUserWithEmailAndPassword(email, password)

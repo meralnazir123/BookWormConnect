@@ -85,6 +85,7 @@ public class PostDetailActivity extends AppCompatActivity {
         post.put("bookType", bookType);
         post.put("description", description);
         post.put("time", System.currentTimeMillis());
+        post.put("userId", FirebaseAuth.getInstance().getUid());
 
         FirebaseFirestore.getInstance()
                 .collection("posts")

@@ -7,7 +7,10 @@ import androidx.room.PrimaryKey;
 public class postmodel {
 
     @PrimaryKey(autoGenerate = true)
+
     public int id;
+public String docId;
+    public String userId;
 
     public String url;
     public String username;

@@ -34,7 +34,6 @@
             android:src="@drawable/bin"
             app:tint="#fff3c2"
             tools:ignore="TouchTargetSizeCheck">
-
         </ImageButton>
     </LinearLayout>
 

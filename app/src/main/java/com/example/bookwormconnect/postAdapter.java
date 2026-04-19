@@ -8,12 +8,15 @@ import android.view.ViewGroup;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
-import com.google.firebase.Firebase;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -48,13 +51,20 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.PostViewHolder
 holder.deleteBtn.setOnClickListener(v -> {
     new AlertDialog.Builder(holder.itemView.getContext()).setTitle("Delete Post")
             .setMessage("Are you sure?").setPositiveButton("Delete", (dialog, which) -> {
-                FirebaseFirestore.getInstance().collection("posts")
-                        .document(post.docId + "")
-                        .delete()
-                        .addOnSuccessListener(aVoid->{
-                            postList.remove(position);
-                            notifyItemRemoved(position);
-                        });
+                StorageReference storageRef = FirebaseStorage.getInstance()
+                        .getReferenceFromUrl(post.getImageUrl());
+                storageRef.delete().addOnSuccessListener(aVoid-> {
+                    FirebaseFirestore.getInstance().collection("posts")
+                            .document(post.docId)
+                            .delete()
+                            .addOnSuccessListener(unused -> {
+                                postList.remove(position);
+                                notifyItemRemoved(position);
+                            });
+                }).addOnFailureListener(e -> {
+                    Toast.makeText(holder.itemView.getContext(),
+                            "Failed to delete image", Toast.LENGTH_SHORT).show();
+                });
             }).setNegativeButton("Cancel",null).show();
 });
 

@@ -62,7 +62,7 @@ public class CategoriesFragment extends Fragment {
         adapter = new postAdapter(postList);
         recyclerView.setAdapter(adapter);
 
-        loadPostsByCategory(); // 🔥 load posts
+        loadPostsByCategory();  //load posts
 
         return view;
     }

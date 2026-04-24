@@ -17,6 +17,8 @@ public String docId;
     String bookType;
     String description;
     public long time;
+    public String duration;
+    public String deposit;
 
     public postmodel() {}
 
@@ -36,15 +38,12 @@ public String docId;
     public String getUsername() {
         return username;
     }
-
     public String getBookType() {
         return bookType;
     }
-
     public String getDescription() {
         return description;
     }
-
 
     public long getTime() {
         return time;

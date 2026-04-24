@@ -1,5 +1,6 @@
 package com.example.bookwormconnect;
 
+import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Bundle;
 import android.widget.ArrayAdapter;
@@ -24,6 +25,8 @@ public class PostDetailActivity extends AppCompatActivity {
     Spinner spinner;
     EditText etDescription;
     Button postButton;
+    EditText depositET;
+    EditText durationET;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -33,6 +36,9 @@ public class PostDetailActivity extends AppCompatActivity {
         spinner = findViewById(R.id.bookTypeSpinner);
         etDescription = findViewById(R.id.etDescription);
         postButton = findViewById(R.id.postButton);
+        depositET=findViewById(R.id.lendingdepositET);
+        durationET=findViewById(R.id.durationET);
+
 
         ArrayAdapter<String> adapter = new ArrayAdapter<>(
                 this,
@@ -45,6 +51,14 @@ public class PostDetailActivity extends AppCompatActivity {
         spinner.setAdapter(adapter);
 
         postButton.setOnClickListener(v -> uploadImageThenPost());
+    }
+    @Override
+    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+        if (requestCode == 100 && resultCode == RESULT_OK) {
+            String address = data.getStringExtra("address");
+        }
     }
 
     private void uploadImageThenPost() {
@@ -78,6 +92,18 @@ public class PostDetailActivity extends AppCompatActivity {
 
         String bookType = spinner.getSelectedItem().toString();
         String description = etDescription.getText().toString();
+        String duration = durationET.getText().toString().trim();
+        String deposit = depositET.getText().toString().trim();
+
+        if (bookType.equals("Select book type")) {
+            Toast.makeText(this, "Select book type", Toast.LENGTH_SHORT).show();
+            return;
+        }
+
+        if (duration.isEmpty() || deposit.isEmpty()) {
+            Toast.makeText(this, "Fill all fields", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
         Map<String, Object> post = new HashMap<>();
         post.put("url", imageUrl);
@@ -86,19 +112,13 @@ public class PostDetailActivity extends AppCompatActivity {
         post.put("description", description);
         post.put("time", System.currentTimeMillis());
         post.put("userId", FirebaseAuth.getInstance().getUid());
+        post.put("duration", duration);
+        post.put("deposit", deposit);
 
         FirebaseFirestore.getInstance()
                 .collection("posts")
                 .add(post)
                 .addOnSuccessListener(doc -> {
-
-                    postmodel entity = new postmodel();
-                    entity.url = imageUrl;
-                    entity.username = TempPostHolder.username;
-                    post.put("userId", FirebaseAuth.getInstance().getUid());
-                    entity.bookType = bookType;
-                    entity.description = description;
-                    entity.time = System.currentTimeMillis();
 
                     TempPostHolder.bitmap = null;
                     TempPostHolder.username = null;

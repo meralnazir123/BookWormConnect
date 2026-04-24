@@ -1,0 +1,81 @@
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <!-- 🔍 Search Bar -->
+    <EditText
+        android:id="@+id/searchEt"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:background="#FFFFFF"
+        android:elevation="6dp"
+        android:textColor="@color/black"
+        android:hint="Search location..."
+        android:minHeight="48dp"
+        android:padding="10dp" />
+
+    <!-- 🔍 Search Button -->
+    <Button
+        android:id="@+id/searchBtn"
+        android:text="Search"
+        android:textColor="@color/black"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/searchEt"
+        android:backgroundTint="#fff3c2"
+       android:layout_centerHorizontal="true"
+        android:layout_margin="8dp"/>
+
+    <!-- 🗺 Map -->
+    <org.osmdroid.views.MapView
+        android:id="@+id/map"
+        android:layout_below="@id/searchBtn"
+        android:layout_above="@id/bottomLayout"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
+    <!-- 📦 Bottom Panel -->
+    <LinearLayout
+        android:id="@+id/bottomLayout"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_marginBottom="0dp"
+        android:background="#FFFFFF"
+        android:elevation="8dp"
+        android:orientation="vertical"
+        android:padding="12dp">
+
+        <!-- 📍 Auto Address -->
+        <TextView
+            android:id="@+id/addressTv"
+            android:layout_height="wrap_content"
+            android:paddingBottom="6dp"
+            android:text="Selected location will appear here"
+            android:textColor="#000000"
+            android:textSize="14sp"
+            android:layout_width="match_parent"/>
+
+        <!-- ✏️ Manual Details -->
+        <EditText
+            android:id="@+id/detailsEt"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textColor="@color/black"
+            android:hint="House no, Street no (optional)"
+            android:minHeight="48dp" />
+
+        <!-- ✅ Confirm Button -->
+        <Button
+            android:id="@+id/confirmBtn"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:backgroundTint="#fff3c2"
+            android:textColor="@color/black"
+            android:text="Confirm Location" />
+
+    </LinearLayout>
+
+</RelativeLayout>

@@ -49,6 +49,8 @@ public class HomeActivity extends AppCompatActivity {
     ActivityResultLauncher<Intent> imagePickerLauncher;
     ActivityResultLauncher<String> cameraPermissionLauncher;
 
+    ImageButton requestButton;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -58,7 +60,7 @@ public class HomeActivity extends AppCompatActivity {
         searchView = findViewById(R.id.searchView);
         Camera = findViewById(R.id.camera);
         recyclerView = findViewById(R.id.RecyclerV);
-
+        requestButton=findViewById(R.id.requestButton);
         postList = new ArrayList<>();
         adapter = new postAdapter(postList);
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -148,7 +150,8 @@ public class HomeActivity extends AppCompatActivity {
                     loadFragment(new MybooksFragment());
                 } else if (id == R.id.novels) {
                     fragment = CategoriesFragment.newInstance("Novel");
-                } else if (id == R.id.textbooks) {
+                }
+                else if (id == R.id.textbooks) {
                     fragment = CategoriesFragment.newInstance("Text Book");
                 } else if (id == R.id.home) {
                     Intent intent = new Intent(HomeActivity.this, HomeActivity.class);
@@ -156,7 +159,11 @@ public class HomeActivity extends AppCompatActivity {
                     finish();
                 } else if (id == R.id.chat) {
                     loadFragment(new ChatlistFragment());
-                } else if (id == R.id.setting) {
+                }
+                else if(id==R.id.request){
+                    Intent intent = new Intent(HomeActivity.this, requestActivity.class);
+                    startActivity(intent);
+                }else if (id == R.id.setting) {
                     loadFragment(new settingFragment());
                 } else if (id == R.id.logout) {
                     FirebaseAuth.getInstance().signOut();
@@ -284,22 +291,19 @@ public class HomeActivity extends AppCompatActivity {
                 .addOnSuccessListener(queryDocumentSnapshots -> {
 
                     postList.clear();
+
                     for (DocumentSnapshot doc : queryDocumentSnapshots) {
-                        postmodel post = new postmodel();
-                        post.docId=doc.getId();
-                        post.userId = doc.getString("userId");
-                        post.url = doc.getString("url");
-                        post.username = doc.getString("username");
-                        post.bookType = doc.getString("bookType");
-                        post.description = doc.getString("description");
-                        post.time = doc.getLong("time");
+                        postmodel post = doc.toObject(postmodel.class);
+                        post.docId = doc.getId();
+
                         postList.add(post);
                     }
-                    adapter.notifyDataSetChanged();
 
+                    adapter.notifyDataSetChanged();
                 })
                 .addOnFailureListener(e ->
-                        Toast.makeText(HomeActivity.this, "Failed to load posts",
+                        Toast.makeText(HomeActivity.this,
+                                "Failed to load posts",
                                 Toast.LENGTH_SHORT).show());
     }
 

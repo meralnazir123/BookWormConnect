@@ -47,8 +47,32 @@
         android:id="@+id/etDescription"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
+        android:layout_marginTop="10dp"
         android:hint="Write something about the book..."
+        android:inputType="textMultiLine"
+        android:minLines="3"
+        android:textColor="#fff3c2"
+        tools:ignore="HardcodedText" />
+
+    <EditText
+
+        android:id="@+id/durationET"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:hint="Enter lending Period(3 weeks,1 month)"
+        android:inputType="textMultiLine"
+        android:minLines="3"
+        android:textColor="#fff3c2"
+        tools:ignore="HardcodedText" />
+
+    <EditText
+
+        android:id="@+id/lendingdepositET"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp"
+        android:hint="Lending Deposit(e.g., 500,1000)"
         android:inputType="textMultiLine"
         android:minLines="3"
         android:textColor="#fff3c2"
@@ -57,9 +81,9 @@
     <Button
         android:id="@+id/postButton"
         android:layout_width="112dp"
-        android:layout_height="wrap_content"
+        android:layout_height="49dp"
         android:layout_gravity="center"
-        android:layout_marginTop="188dp"
+        android:layout_marginTop="80dp"
         android:backgroundTint="#fff3c2"
         android:text="Post"
         android:textColor="@color/black" />

@@ -30,14 +30,6 @@
                 android:layout_marginTop="5dp">
             </androidx.recyclerview.widget.RecyclerView>
 
-            <ImageButton
-                android:id="@+id/camera"
-                android:layout_width="60dp"
-                android:layout_height="60dp"
-                android:layout_gravity="bottom|center"
-                android:background="@null"
-                android:src="@drawable/camera"/>
-
         </LinearLayout>
     </FrameLayout>
 </LinearLayout>

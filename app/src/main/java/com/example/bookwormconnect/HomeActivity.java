@@ -58,7 +58,7 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         searchView = findViewById(R.id.searchView);
-        Camera = findViewById(R.id.camera);
+
         recyclerView = findViewById(R.id.RecyclerV);
         requestButton=findViewById(R.id.requestButton);
         postList = new ArrayList<>();
@@ -100,17 +100,6 @@ public class HomeActivity extends AppCompatActivity {
                             fetchUsernameAndUpload(bitmap);
                     }
                 });
-
-        Camera.setOnClickListener(v -> {
-            if (checkSelfPermission(android.Manifest.permission.CAMERA)
-                    == PackageManager.PERMISSION_GRANTED) {
-
-                openCameraChooser();
-
-            } else {
-                cameraPermissionLauncher.launch(android.Manifest.permission.CAMERA);
-            }
-        });
 
         DrawerLayout drawer = findViewById(R.id.drawerlayout);
         Toolbar toolbar = findViewById(R.id.toolbar);
@@ -163,7 +152,15 @@ public class HomeActivity extends AppCompatActivity {
                 else if(id==R.id.request){
                     Intent intent = new Intent(HomeActivity.this, requestActivity.class);
                     startActivity(intent);
-                }else if (id == R.id.setting) {
+                } else if (id==R.id.post) {
+                        if (checkSelfPermission(android.Manifest.permission.CAMERA)
+                                == PackageManager.PERMISSION_GRANTED) {
+                            openCameraChooser();
+
+                        } else {
+                            cameraPermissionLauncher.launch(android.Manifest.permission.CAMERA);
+                        }
+                } else if (id == R.id.setting) {
                     loadFragment(new settingFragment());
                 } else if (id == R.id.logout) {
                     FirebaseAuth.getInstance().signOut();

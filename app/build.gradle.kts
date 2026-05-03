@@ -33,8 +33,7 @@ android {
 }
 
 dependencies {
-    implementation("org.osmdroid:osmdroid-android:6.1.16")
-    implementation("com.squareup.okhttp3:okhttp:4.12.0")
+
     implementation(libs.appcompat)
     implementation(libs.material)
     implementation(libs.activity)
@@ -43,12 +42,9 @@ dependencies {
     implementation(libs.firebase.database)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage)
-    implementation (libs.glide)
-    implementation(libs.room.common.jvm)
-    implementation(libs.room.runtime.android)
-    implementation(libs.mediation.test.suite)
+    implementation ("com.github.bumptech.glide:glide:4.16.0")
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
-    implementation(platform("com.google.firebase:firebase-bom:32.7.0"))
+
 }

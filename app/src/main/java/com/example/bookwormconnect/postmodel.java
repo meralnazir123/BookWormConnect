@@ -19,6 +19,9 @@ public String docId;
     public long time;
     public String duration;
     public String deposit;
+    public String borrowerId;
+    public String status;
+    public String returnDate;
 
     public postmodel() {}
 

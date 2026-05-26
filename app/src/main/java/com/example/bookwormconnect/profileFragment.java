@@ -15,7 +15,7 @@ public class profileFragment extends Fragment {
     public void onResume() {
         super.onResume();
         ((HomeActivity) requireActivity()).hideSearchBar();
-        ((HomeActivity) requireActivity()).hideCamera();
+
     }
 
     @Override

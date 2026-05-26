@@ -40,7 +40,6 @@ import com.google.firebase.firestore.Query;
 import java.util.ArrayList;
 
 public class HomeActivity extends AppCompatActivity {
-    ImageButton Camera;
     RecyclerView recyclerView;
     ArrayList<postmodel> postList;
     postAdapter adapter;
@@ -62,7 +61,7 @@ public class HomeActivity extends AppCompatActivity {
         recyclerView = findViewById(R.id.RecyclerV);
         requestButton=findViewById(R.id.requestButton);
         postList = new ArrayList<>();
-        adapter = new postAdapter(postList);
+        adapter = new postAdapter(postList, "HOME");
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
         firestore = FirebaseFirestore.getInstance();
@@ -327,9 +326,6 @@ public class HomeActivity extends AppCompatActivity {
         searchView.setVisibility(View.GONE);
     }
 
-    public void hideCamera() {
-        Camera.setVisibility(View.GONE);
-    }
 
     protected void onResume() {
         super.onResume();

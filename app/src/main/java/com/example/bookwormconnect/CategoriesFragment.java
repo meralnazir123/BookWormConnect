@@ -48,7 +48,7 @@ public class CategoriesFragment extends Fragment {
     public void onResume() {
         super.onResume();
         ((HomeActivity) requireActivity()).hideSearchBar();
-        ((HomeActivity) requireActivity()).hideCamera();
+
     }
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -59,7 +59,7 @@ public class CategoriesFragment extends Fragment {
         recyclerView = view.findViewById(R.id.RecyclerV);
         recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
 
-        adapter = new postAdapter(postList);
+        adapter = new postAdapter(postList, "HOME");
         recyclerView.setAdapter(adapter);
 
         loadPostsByCategory();  //load posts

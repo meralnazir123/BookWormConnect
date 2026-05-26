@@ -27,11 +27,12 @@ import java.util.List;
 import java.util.Map;
 
 public class postAdapter extends RecyclerView.Adapter<postAdapter.PostViewHolder> {
-
+    private String type;
     private List<postmodel> postList;
 
-    public postAdapter(List<postmodel> postList){
+    public postAdapter(List<postmodel> postList, String type){
         this.postList=postList;
+        this.type = type;
     }
     @NonNull
     @Override
@@ -51,7 +52,6 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.PostViewHolder
         builder.setView(view);
         AlertDialog dialog = builder.create();
         dialog.show();
-
         EditText addressInput = view.findViewById(R.id.addressInput);
         Button submitBtn = view.findViewById(R.id.submitBtn);
 
@@ -94,10 +94,57 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.PostViewHolder
 
     @Override
     public void onBindViewHolder(@NonNull PostViewHolder holder, int position) {
-
-
         String currentUserId = FirebaseAuth.getInstance().getCurrentUser().getUid();
         postmodel post = postList.get(position);
+        if(type.equals("HOME")){
+
+            holder.requestBtn.setVisibility(View.VISIBLE);
+
+            if(post.userId != null &&
+                    post.userId.equals(currentUserId)){
+
+                holder.deleteBtn.setVisibility(View.VISIBLE);
+
+            }else{
+                holder.deleteBtn.setVisibility(View.GONE);
+            }
+
+            holder.returnDateTv.setVisibility(View.GONE);
+            holder.statusTv.setVisibility(View.GONE);
+        }
+
+        else if(type.equals("MY_POSTS")){
+
+            holder.requestBtn.setVisibility(View.GONE);
+
+            holder.deleteBtn.setVisibility(View.VISIBLE);
+
+            holder.returnDateTv.setVisibility(View.GONE);
+
+            holder.statusTv.setVisibility(View.VISIBLE);
+        }
+
+        else if(type.equals("BORROWED")){
+
+            holder.requestBtn.setVisibility(View.GONE);
+
+            holder.deleteBtn.setVisibility(View.GONE);
+
+            holder.returnDateTv.setVisibility(View.VISIBLE);
+
+            holder.statusTv.setVisibility(View.VISIBLE);
+        }
+
+        else if(type.equals("LENT")){
+
+            holder.requestBtn.setVisibility(View.GONE);
+
+            holder.deleteBtn.setVisibility(View.GONE);
+
+            holder.returnDateTv.setVisibility(View.VISIBLE);
+
+            holder.statusTv.setVisibility(View.VISIBLE);
+        }
         if (post.userId != null && post.userId.equals(currentUserId)) {
             holder.deleteBtn.setVisibility(View.VISIBLE);
         } else {
@@ -129,7 +176,8 @@ holder.deleteBtn.setOnClickListener(v -> {
             }).setNegativeButton("Cancel",null).show();
 });
 
-
+        holder.returnDateTv.setText("Return Date: " + post.returnDate);
+        holder.statusTv.setText("Status: " + post.status);
 
         holder.username.setText(post.username);
         holder.bookType.setText(post.bookType);
@@ -162,6 +210,8 @@ holder.deleteBtn.setOnClickListener(v -> {
     }
 
     static class PostViewHolder extends RecyclerView.ViewHolder{
+        public TextView statusTv;
+        public TextView returnDateTv;
         ImageButton deleteBtn;
         ImageButton requestBtn;
 
@@ -172,6 +222,8 @@ holder.deleteBtn.setOnClickListener(v -> {
         TextView durationTv, depositTv;
         public PostViewHolder(@NonNull View itemView) {
             super(itemView);
+            returnDateTv = itemView.findViewById(R.id.returnDateTv);
+            statusTv = itemView.findViewById(R.id.statusTv);
             requestBtn = itemView.findViewById(R.id.requestButton);
             deleteBtn=itemView.findViewById(R.id.deleteBtn);
             postImage=itemView.findViewById(R.id.postImage);

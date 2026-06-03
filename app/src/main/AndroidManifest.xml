@@ -12,30 +12,22 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.BookWormConnect"
         tools:targetApi="31">
-        <activity
-            android:name=".NewsFeedActivity"
-            android:exported="false" />
+        <!-- Profile screen -->
+        <!-- Profile screen is the launcher -->
         <activity
             android:name=".profilescreen"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+
+        <!-- Edit Profile screen -->
+        <activity
+            android:name=".EditProfileActivity"
             android:exported="false" />
-        <activity
-            android:name=".splashscreen"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
 
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
-        <activity
-            android:name=".MainActivity"
-            android:exported="true">
-            <intent-filter>
-                <action android:name="android.intent.action.MAIN" />
-
-                <category android:name="android.intent.category.LAUNCHER" />
-            </intent-filter>
-        </activity>
     </application>
 
 </manifest>

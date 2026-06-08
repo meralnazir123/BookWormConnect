@@ -14,6 +14,10 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.FirebaseFirestore;
+
+import java.util.HashMap;
+import java.util.Map;
 
 public class RegisterActivity extends AppCompatActivity {
 
@@ -70,8 +74,17 @@ public class RegisterActivity extends AppCompatActivity {
                             if (task.isSuccessful()) {
                                 FirebaseUser user = mAuth.getCurrentUser();
                                 if (user != null) {
-                                    databaseReference.child(user.getUid()).child("username").setValue(username);
-                                    databaseReference.child(user.getUid()).child("email").setValue(email);
+                                    FirebaseFirestore db = FirebaseFirestore.getInstance();
+
+                                    Map<String, Object> userData = new HashMap<>();
+                                    userData.put("username", username);
+                                    userData.put("email", email);
+                                    userData.put("bio", "");
+                                    userData.put("profileImageUrl", "");
+
+                                    db.collection("users")
+                                            .document(user.getUid())
+                                            .set(userData);
                                     user.sendEmailVerification();
                                     Toast.makeText(RegisterActivity.this,
                                             "Verification email sent",

@@ -1,28 +1,15 @@
 package com.example.bookwormconnect;
-
 import android.content.Intent;
-import android.os.Binder;
 import android.os.Bundle;
-import android.renderscript.ScriptGroup;
 import android.util.Log;
 import android.widget.RatingBar;
 import android.widget.TextView;
-
 import com.bumptech.glide.Glide;
-
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.graphics.Insets;
-import androidx.core.view.ViewCompat;
-import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
-
-
 import com.example.bookwormconnect.databinding.ActivityProfilescreenBinding;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import androidx.annotation.NonNull;
-
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
@@ -34,8 +21,6 @@ import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.net.ssl.SSLSessionBindingEvent;
-
 
 public class profilescreen extends AppCompatActivity {
     private static final String TAG = "ProfileActivity";
@@ -43,6 +28,7 @@ public class profilescreen extends AppCompatActivity {
     private PostAdapter2 postAdapter;
     private List<Post> posts;
     private FirebaseFirestore db;
+    private String profileUserId;
     private FirebaseUser currentUser;
 
     @Override
@@ -57,52 +43,66 @@ public class profilescreen extends AppCompatActivity {
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
         if (currentUser == null) {
-            // Handle not logged in (e.g., redirect to login)
             finish();
             return;
         }
+        profileUserId = getIntent().getStringExtra("USER_ID");
 
-        // Initialize posts list and adapter
+        if (profileUserId == null) {
+            profileUserId = currentUser.getUid();
+        }
+        if (profileUserId.equals(currentUser.getUid())) {
+            binding.btnEditProfile.setVisibility(android.view.View.VISIBLE);
+        } else {
+            binding.btnEditProfile.setVisibility(android.view.View.GONE);
+        }
+
         posts= new ArrayList<>();
         postAdapter = new PostAdapter2(posts);
         binding.PostsRecycler.setLayoutManager(new GridLayoutManager(this, 3));
         binding.PostsRecycler.setAdapter(postAdapter);
-
-        // Load profile data and posts
         loadProfileData();
         loadPosts();
         binding.btnEditProfile.setOnClickListener(v -> {
             Intent intent = new Intent(profilescreen.this, EditProfileActivity.class);
             startActivity(intent);
         });
-
-        // RatingBar setup (INSIDE onCreate)
         RatingBar ratingBar = binding.RatingBar;
         TextView averageRatingText = binding.averageRatingText;
 
-        // Load average rating when profile opens
         loadAverageRating(averageRatingText);
 
-        // Handle user rating input
-        ratingBar.setOnRatingBarChangeListener((bar, rating, fromUser) -> {
-            if (fromUser) {
-                String uid = currentUser.getUid();
-                String profileId = currentUser.getUid(); // or another user's profile ID
+        if(profileUserId.equals(currentUser.getUid())){
 
-                db.collection("users").document(profileId)
-                        .collection("ratings").document(uid)
-                        .set(new Rating(rating))
-                        .addOnSuccessListener(aVoid -> {
-                            Log.d(TAG, "Rating submitted: " + rating);
-                            loadAverageRating(averageRatingText); // refresh average
-                        })
-                        .addOnFailureListener(e -> Log.w(TAG, "Error submitting rating", e));
-            }
-        });
+            ratingBar.setIsIndicator(true);
+
+        }else{
+
+            ratingBar.setIsIndicator(false);
+
+            loadUserRating();
+
+            ratingBar.setOnRatingBarChangeListener((bar, rating, fromUser) -> {
+
+                if(fromUser){
+
+                    db.collection("users")
+                            .document(profileUserId)
+                            .collection("ratings")
+                            .document(currentUser.getUid())
+                            .set(new Rating(rating))
+                            .addOnSuccessListener(unused -> {
+
+                                loadAverageRating(binding.averageRatingText);
+
+                            });
+                }
+            });
+        }
     }
 
     private void loadProfileData() {
-        db.collection("users").document(currentUser.getUid()).get()
+        db.collection("users").document(profileUserId).get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
                     public void onComplete(@NonNull Task<DocumentSnapshot> task) {
@@ -112,15 +112,19 @@ public class profilescreen extends AppCompatActivity {
                                 String profileImageUrl = document.getString("profileImageUrl");
                                 String userName = document.getString("username");
                                 String userBio = document.getString("bio");
-                                Long postsCnt = document.getLong("postsCount");
+                                if (profileImageUrl != null && !profileImageUrl.isEmpty()) {
 
-                                // Set data using binding
-                                if (profileImageUrl != null) {
-                                    Glide.with(profilescreen.this).load(profileImageUrl).into(binding.UserProfile);
+                                    Glide.with(profilescreen.this)
+                                            .load(profileImageUrl)
+                                            .into(binding.UserProfile);
+
+                                } else {
+
+                                    binding.UserProfile.setImageResource(R.drawable.user);
                                 }
                                 binding.UserName.setText(userName != null ? userName : "Username");
                                 binding.UserBio.setText(userBio != null ? userBio : "Bio");
-                                binding.postsCount.setText((postsCnt != null ? postsCnt : 0) + "\nPosts");
+
 
                             } else {
                                 Log.d(TAG, "No such document");
@@ -131,9 +135,31 @@ public class profilescreen extends AppCompatActivity {
                     }
                 });
     }
+    private void loadUserRating() {
 
+        db.collection("users")
+                .document(profileUserId)
+                .collection("ratings")
+                .document(currentUser.getUid())
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
+
+                    if(documentSnapshot.exists()){
+
+                        Double rating =
+                                documentSnapshot.getDouble("rating");
+
+                        if(rating != null){
+
+                            binding.RatingBar.setRating(
+                                    rating.floatValue()
+                            );
+                        }
+                    }
+                });
+    }
     private void loadPosts() {
-        db.collection("users").document(currentUser.getUid()).collection("posts")
+        db.collection("users").document(profileUserId).collection("posts")
                 .get()
                 .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
                     @Override
@@ -141,38 +167,59 @@ public class profilescreen extends AppCompatActivity {
                         if (task.isSuccessful()) {
                             posts.clear();
                             for (QueryDocumentSnapshot document : task.getResult()) {
-                                String imageUrl = document.getString("imageUrl");
-                                String caption = document.getString("caption");
-                                posts.add(new Post(imageUrl, caption));
+                                String imageUrl = document.getString("url");
+                                String description = document.getString("description");
+                                posts.add(new Post(imageUrl, description));
                             }
                             postAdapter.notifyDataSetChanged();
+                            binding.postsCount.setText(posts.size() + "\nPosts");
                         } else {
                             Log.d(TAG, "Error getting posts: ", task.getException());
                         }
                     }
                 });
     }
-    // ⭐ Helper method for average rating
     private void loadAverageRating(TextView averageRatingText) {
-        db.collection("users").document(currentUser.getUid())
+
+        db.collection("users")
+                .document(profileUserId)
                 .collection("ratings")
                 .get()
                 .addOnCompleteListener(task -> {
+
                     if (task.isSuccessful()) {
+
                         double total = 0;
                         int count = 0;
+
                         for (DocumentSnapshot doc : task.getResult()) {
+
                             Double rating = doc.getDouble("rating");
+
                             if (rating != null) {
                                 total += rating;
                                 count++;
                             }
                         }
+
                         double average = count > 0 ? total / count : 0;
-                        averageRatingText.setText("Average Rating: " + String.format("%.1f", average));
+
                         binding.RatingBar.setRating((float) average);
-                    } else {
-                        Log.w(TAG, "Error getting ratings", task.getException());
+
+                        averageRatingText.setText(
+                                "Average Rating: " + String.format("%.1f", average)
+                        );
+
                     }
                 });
-}}
+    }
+    @Override
+    protected void onResume() {
+        super.onResume();
+
+        loadProfileData();
+        loadPosts();
+        loadAverageRating(binding.averageRatingText);
+    }
+
+}

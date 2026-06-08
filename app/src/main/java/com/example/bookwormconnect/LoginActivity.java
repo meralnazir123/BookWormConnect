@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -27,7 +25,7 @@ import com.google.firebase.database.ValueEventListener;
 
 public class LoginActivity extends AppCompatActivity {
 
-    TextView registerTV;
+    TextView registerTV, forgetPW;
     EditText UN, PW;
     Button button;
     FirebaseAuth mAuth;
@@ -66,6 +64,10 @@ public class LoginActivity extends AppCompatActivity {
         PW = findViewById(R.id.pwd);
         button = findViewById(R.id.button);
         registerTV = findViewById(R.id.RegisterTV);
+        forgetPW=findViewById(R.id.forgetPW);
+
+        forgetPW.setOnClickListener(v -> startActivity(new Intent(LoginActivity.this,
+                forgetPW.class)));
 
         loadLoginPreferences();
         registerTV.setOnClickListener(v -> {

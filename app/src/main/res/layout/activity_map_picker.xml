@@ -27,7 +27,6 @@
        android:layout_centerHorizontal="true"
         android:layout_margin="8dp"/>
 
-    <!-- 🗺 Map -->
     <org.osmdroid.views.MapView
         android:id="@+id/map"
         android:layout_below="@id/searchBtn"
@@ -35,7 +34,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent" />
 
-    <!-- 📦 Bottom Panel -->
     <LinearLayout
         android:id="@+id/bottomLayout"
         android:layout_width="match_parent"

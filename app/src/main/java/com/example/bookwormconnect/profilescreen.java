@@ -146,13 +146,16 @@ public class profilescreen extends AppCompatActivity {
                                 posts.add(new Post(imageUrl, caption));
                             }
                             postAdapter.notifyDataSetChanged();
+                            // update post count dynamically
+                            int postCount= posts.size();
+                            binding.postsCount.setText(postCount + "\nPosts");
                         } else {
                             Log.d(TAG, "Error getting posts: ", task.getException());
                         }
                     }
                 });
     }
-    // ⭐ Helper method for average rating
+    // Helper method for average rating
     private void loadAverageRating(TextView averageRatingText) {
         db.collection("users").document(currentUser.getUid())
                 .collection("ratings")

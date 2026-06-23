@@ -7,6 +7,11 @@
     <group
         android:checkableBehavior="single"/>
     <item
+        android:id="@+id/post"
+        android:icon="@drawable/camera"
+        android:title="Add Post"
+        />
+    <item
         android:id="@+id/home"
         android:icon="@drawable/home"
         android:title="Home"
@@ -29,7 +34,7 @@
 
     <item
         android:id="@+id/request"
-        android:icon="@drawable/home"
+        android:icon="@drawable/request"
         android:title="Requests"
         />
 

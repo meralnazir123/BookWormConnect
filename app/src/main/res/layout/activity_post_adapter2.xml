@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="utf-8"?>
 <FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/main"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:background="@drawable/background1"
-    tools:context=".profileFragment">
-
-    <!-- TODO: Update blank fragment layout -->
-    <TextView
+    android:layout_height="120dp"
+    android:layout_margin="2dp"
+    tools:context=".PostAdapter2">
+    <ImageView
+        android:id="@+id/post_image"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:textSize="45dp"
-        android:text="Profile fragment" />
+        android:scaleType="centerCrop" />
 
 </FrameLayout>

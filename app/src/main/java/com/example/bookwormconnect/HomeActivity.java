@@ -1,4 +1,3 @@
-
 package com.example.bookwormconnect;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -25,22 +24,16 @@ import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseError;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
+import com.google.firebase.messaging.FirebaseMessaging;
 
 import java.util.ArrayList;
 
 public class HomeActivity extends AppCompatActivity {
-    ImageButton Camera;
     RecyclerView recyclerView;
     ArrayList<postmodel> postList;
     postAdapter adapter;
@@ -58,11 +51,23 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(R.layout.activity_home);
 
         searchView = findViewById(R.id.searchView);
-        Camera = findViewById(R.id.camera);
+
+        FirebaseMessaging.getInstance().getToken()
+                .addOnSuccessListener(token -> {
+
+                    String uid = FirebaseAuth.getInstance().getUid();
+
+                    if (uid != null) {
+                        FirebaseFirestore.getInstance()
+                                .collection("users")
+                                .document(uid)
+                                .update("fcmToken", token);
+                    }
+                });
         recyclerView = findViewById(R.id.RecyclerV);
         requestButton=findViewById(R.id.requestButton);
         postList = new ArrayList<>();
-        adapter = new postAdapter(postList);
+        adapter = new postAdapter(postList, "HOME");
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
         recyclerView.setAdapter(adapter);
         firestore = FirebaseFirestore.getInstance();
@@ -100,18 +105,6 @@ public class HomeActivity extends AppCompatActivity {
                             fetchUsernameAndUpload(bitmap);
                     }
                 });
-
-        Camera.setOnClickListener(v -> {
-            if (checkSelfPermission(android.Manifest.permission.CAMERA)
-                    == PackageManager.PERMISSION_GRANTED) {
-
-                openCameraChooser();
-
-            } else {
-                cameraPermissionLauncher.launch(android.Manifest.permission.CAMERA);
-            }
-        });
-
         DrawerLayout drawer = findViewById(R.id.drawerlayout);
         Toolbar toolbar = findViewById(R.id.toolbar);
         NavigationView navigationView = findViewById(R.id.navD);
@@ -138,14 +131,13 @@ public class HomeActivity extends AppCompatActivity {
         drawer.addDrawerListener(toggle);
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
-
             Fragment fragment = null;
-
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
                 if (id == R.id.profile) {
-                    loadFragment(new profileFragment());
+                    Intent intent = new Intent(HomeActivity.this, profilescreen.class);
+                    startActivity(intent);
                 } else if (id == R.id.MyBooks) {
                     loadFragment(new MybooksFragment());
                 } else if (id == R.id.novels) {
@@ -154,16 +146,22 @@ public class HomeActivity extends AppCompatActivity {
                 else if (id == R.id.textbooks) {
                     fragment = CategoriesFragment.newInstance("Text Book");
                 } else if (id == R.id.home) {
-                    Intent intent = new Intent(HomeActivity.this, HomeActivity.class);
-                    startActivity(intent);
-                    finish();
+                    drawer.closeDrawer(GravityCompat.START);
+                    return true;
                 } else if (id == R.id.chat) {
                     loadFragment(new ChatlistFragment());
                 }
                 else if(id==R.id.request){
                     Intent intent = new Intent(HomeActivity.this, requestActivity.class);
                     startActivity(intent);
-                }else if (id == R.id.setting) {
+                } else if (id==R.id.post) {
+                        if (checkSelfPermission(android.Manifest.permission.CAMERA)
+                                == PackageManager.PERMISSION_GRANTED) {
+                            openCameraChooser();
+                        } else {
+                            cameraPermissionLauncher.launch(android.Manifest.permission.CAMERA);
+                        }
+                } else if (id == R.id.setting) {
                     loadFragment(new settingFragment());
                 } else if (id == R.id.logout) {
                     FirebaseAuth.getInstance().signOut();
@@ -174,7 +172,6 @@ public class HomeActivity extends AppCompatActivity {
                 }
                 if (fragment != null) {
                     FrameLayout frame = findViewById(R.id.frame);
-                    frame.removeAllViews();
 
                     getSupportFragmentManager()
                             .beginTransaction()
@@ -241,46 +238,42 @@ public class HomeActivity extends AppCompatActivity {
             return;
         }
 
-        DatabaseReference userRef = FirebaseDatabase.getInstance()
-                .getReference("users")
-                .child(uid);
+        FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(uid)
+                .get()
+                .addOnSuccessListener(documentSnapshot -> {
 
-        userRef.addListenerForSingleValueEvent(new ValueEventListener() {
-            @Override
-            public void onDataChange(@NonNull DataSnapshot snapshot) {
+                    if (documentSnapshot.exists()) {
 
-                if (snapshot.exists()) {
-                    String username = snapshot.child("username").getValue(String.class);
+                        String username = documentSnapshot.getString("username");
 
-                    if (username != null) {
+                        if (username != null) {
 
-                        TempPostHolder.username = username;
-                        TempPostHolder.bitmap = bitmap;
+                            TempPostHolder.username = username;
+                            TempPostHolder.bitmap = bitmap;
 
-                        startActivity(
-                                new Intent(HomeActivity.this, PostDetailActivity.class)
-                        );
+                            startActivity(new Intent(HomeActivity.this,
+                                    PostDetailActivity.class));
+
+                        } else {
+                            Toast.makeText(this,
+                                    "Username field missing",
+                                    Toast.LENGTH_SHORT).show();
+                        }
+
                     } else {
-                        Toast.makeText(HomeActivity.this,
-                                "Username field missing",
+                        Toast.makeText(this,
+                                "User record not found",
                                 Toast.LENGTH_SHORT).show();
                     }
 
-                } else {
-                    Toast.makeText(HomeActivity.this,
-                            "User record not found",
-                            Toast.LENGTH_SHORT).show();
-                }
-            }
-
-            @Override
-            public void onCancelled(@NonNull DatabaseError error) {
-                Toast.makeText(HomeActivity.this,
-                        error.getMessage(),
-                        Toast.LENGTH_SHORT).show();
-
-            }
-        });
+                })
+                .addOnFailureListener(e ->
+                        Toast.makeText(this,
+                                e.getMessage(),
+                                Toast.LENGTH_SHORT).show()
+                );
     }
 
     private void loadImages() {
@@ -330,9 +323,6 @@ public class HomeActivity extends AppCompatActivity {
         searchView.setVisibility(View.GONE);
     }
 
-    public void hideCamera() {
-        Camera.setVisibility(View.GONE);
-    }
 
     protected void onResume() {
         super.onResume();

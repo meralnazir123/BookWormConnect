@@ -4,8 +4,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -27,7 +25,7 @@ import com.google.firebase.database.ValueEventListener;
 
 public class LoginActivity extends AppCompatActivity {
 
-    TextView registerTV;
+    TextView registerTV, forgetPW;
     EditText UN, PW;
     Button button;
     FirebaseAuth mAuth;
@@ -49,9 +47,15 @@ public class LoginActivity extends AppCompatActivity {
         FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
         boolean rememberMe = sharedPreferences.getBoolean(PREF_REMEMBER_ME, false);
 
-        if (currentUser != null && rememberMe) {
-            startActivity(new Intent(LoginActivity.this, HomeActivity.class));
+        if (currentUser != null &&
+                currentUser.isEmailVerified() &&
+                rememberMe) {
+
+            startActivity(new Intent(LoginActivity.this,
+                    HomeActivity.class));
+
             finish();
+
             return;
         }
         databaseReference = FirebaseDatabase.getInstance().getReference("users");
@@ -60,6 +64,10 @@ public class LoginActivity extends AppCompatActivity {
         PW = findViewById(R.id.pwd);
         button = findViewById(R.id.button);
         registerTV = findViewById(R.id.RegisterTV);
+        forgetPW=findViewById(R.id.forgetPW);
+
+        forgetPW.setOnClickListener(v -> startActivity(new Intent(LoginActivity.this,
+                forgetPW.class)));
 
         loadLoginPreferences();
         registerTV.setOnClickListener(v -> {
@@ -68,60 +76,83 @@ public class LoginActivity extends AppCompatActivity {
             finish();
         });
 
+        button.setOnClickListener(v -> {
+            String username = UN.getText().toString().trim();
+            String password = PW.getText().toString().trim();
+            boolean rememberMe1 =checkBox.isChecked();
 
-
-        button.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                String username = UN.getText().toString().trim();
-                String password = PW.getText().toString().trim();
-                boolean rememberMe=checkBox.isChecked();
-
-                if (username.isEmpty() || password.isEmpty()) {
-                    Toast.makeText(LoginActivity.this, "All fields required!", Toast.LENGTH_SHORT).show();
-                    return;
-                }
-
-                SharedPreferences.Editor editor=sharedPreferences.edit();
-                if (rememberMe) {
-                    editor.putString(PREF_USERNAME, username);
-                    editor.putBoolean(PREF_REMEMBER_ME, true);
-                } else {
-                    editor.remove(PREF_USERNAME);
-                    editor.putBoolean(PREF_REMEMBER_ME, false);
-                }
-                editor.apply();
-                databaseReference.orderByChild("username").equalTo(username)
-                        .addListenerForSingleValueEvent(new ValueEventListener() {
-                            @Override
-                            public void onDataChange(@NonNull DataSnapshot snapshot) {
-                                if (snapshot.exists()) {
-                                    for (DataSnapshot userSnapshot : snapshot.getChildren()) {
-                                        String email = userSnapshot.child("email").getValue(String.class);
-                                        if (email != null) {
-                                            mAuth.signInWithEmailAndPassword(email, password)
-                                                    .addOnCompleteListener(task -> {
-                                                        if (task.isSuccessful()) {
-                                                            Toast.makeText(LoginActivity.this, "Login Successful", Toast.LENGTH_SHORT).show();
-                                                            startActivity(new Intent(LoginActivity.this, HomeActivity.class));
-                                                            finish();
-                                                        } else {
-                                                            Toast.makeText(LoginActivity.this, "Invalid credentials", Toast.LENGTH_SHORT).show();
-                                                        }
-                                                    });
-                                        }
-                                    }
-                                } else {
-                                    Toast.makeText(LoginActivity.this, "Username not found", Toast.LENGTH_SHORT).show();
-                                }
-                            }
-
-                            @Override
-                            public void onCancelled(@NonNull DatabaseError error) {
-                                Toast.makeText(LoginActivity.this, "Database error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
-                            }
-                        });
+            if (username.isEmpty() || password.isEmpty()) {
+                Toast.makeText(LoginActivity.this, "All fields required!", Toast.LENGTH_SHORT).show();
+                return;
             }
+
+            SharedPreferences.Editor editor=sharedPreferences.edit();
+            if (rememberMe1) {
+                editor.putString(PREF_USERNAME, username);
+                editor.putBoolean(PREF_REMEMBER_ME, true);
+            } else {
+                editor.remove(PREF_USERNAME);
+                editor.putBoolean(PREF_REMEMBER_ME, false);
+            }
+            editor.apply();
+            databaseReference.orderByChild("username").equalTo(username)
+                    .addListenerForSingleValueEvent(new ValueEventListener() {
+                        @Override
+                        public void onDataChange(@NonNull DataSnapshot snapshot) {
+                            if (snapshot.exists()) {
+                                for (DataSnapshot userSnapshot : snapshot.getChildren()) {
+                                    String email = userSnapshot.child("email").getValue(String.class);
+                                    if (email != null) {
+                                        mAuth.signInWithEmailAndPassword(email, password)
+                                                .addOnCompleteListener(task -> {
+                                                    if (task.isSuccessful()) {
+
+                                                        FirebaseUser user =
+                                                                FirebaseAuth.getInstance().getCurrentUser();
+
+                                                        if(user != null){
+
+                                                            user.reload().addOnCompleteListener(reloadTask -> {
+
+                                                                if(user.isEmailVerified()){
+
+                                                                    Toast.makeText(LoginActivity.this,
+                                                                            "Login Successful",
+                                                                            Toast.LENGTH_SHORT).show();
+
+                                                                    startActivity(new Intent(LoginActivity.this,
+                                                                            HomeActivity.class));
+
+                                                                    finish();
+
+                                                                }else{
+
+                                                                    Toast.makeText(LoginActivity.this,
+                                                                            "Please verify your email first",
+                                                                            Toast.LENGTH_LONG).show();
+
+                                                                    FirebaseAuth.getInstance().signOut();
+                                                                }
+                                                            });
+                                                        }
+
+                                                    }
+                                                    else {
+                                                        Toast.makeText(LoginActivity.this, "Invalid credentials", Toast.LENGTH_SHORT).show();
+                                                    }
+                                                });
+                                    }
+                                }
+                            } else {
+                                Toast.makeText(LoginActivity.this, "Username not found", Toast.LENGTH_SHORT).show();
+                            }
+                        }
+
+                        @Override
+                        public void onCancelled(@NonNull DatabaseError error) {
+                            Toast.makeText(LoginActivity.this, "Database error: " + error.getMessage(), Toast.LENGTH_SHORT).show();
+                        }
+                    });
         });
     }
 

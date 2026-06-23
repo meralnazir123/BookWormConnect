@@ -22,7 +22,7 @@
         android:id="@+id/acceptBtn"
         android:layout_marginTop="10dp"
         android:text="Accept"
-        android:layout_gravity="center"
+        android:layout_gravity="right"
         android:layout_width="wrap_content"
         android:backgroundTint="#fff3c2"
         android:textColor="@color/black"
@@ -34,7 +34,7 @@
         android:layout_marginTop="10dp"
         android:backgroundTint="#fff3c2"
         android:textColor="@color/black"
-        android:layout_gravity="center"
+        android:layout_gravity="right"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 

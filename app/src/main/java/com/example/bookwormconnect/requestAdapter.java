@@ -8,19 +8,14 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
-
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-
 public class requestAdapter extends RecyclerView.Adapter<requestAdapter.ViewHolder> {
 
     Context context;
@@ -42,10 +37,10 @@ public class requestAdapter extends RecyclerView.Adapter<requestAdapter.ViewHold
 
     @Override
     public void onBindViewHolder(@NonNull ViewHolder holder, int position) {
-
+        request request = list.get(position);
         String currentUserId = FirebaseAuth.getInstance().getUid();
-
-        if (currentUserId!=null && currentUserId.equals(currentUserId)) {
+        if (currentUserId != null &&
+                currentUserId.equals(request.receiverId)) {
             holder.acceptBtn.setVisibility(View.VISIBLE);
             holder.declineBtn.setVisibility(View.VISIBLE);
         } else {
@@ -53,7 +48,7 @@ public class requestAdapter extends RecyclerView.Adapter<requestAdapter.ViewHold
             holder.declineBtn.setVisibility(View.GONE);
         }
         holder.statusTv.setText(request.status);
-        request request = list.get(position);
+
 
         holder.addressTv.setText(
                 request.address != null ? "Address: " + request.address : "No Address"
@@ -70,33 +65,72 @@ public class requestAdapter extends RecyclerView.Adapter<requestAdapter.ViewHold
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        db.collection("requests")
-                .document(request.requestId)
-                .update("status", "accepted", "chatEnabled", true);
+        String chatId =
+                request.senderId + "_" + request.receiverId;
 
-        String chatId = request.senderId + "_" + request.receiverId;
+        Map<String, Object> chat =
+                new HashMap<>();
 
-        Map<String, Object> chat = new HashMap<>();
-        chat.put("participants", Arrays.asList(request.senderId, request.receiverId));
+        chat.put("chatId", chatId);
         chat.put("requestId", request.requestId);
+        chat.put("senderId", request.senderId);
+        chat.put("receiverId", request.receiverId);
+        chat.put("participants",
+                Arrays.asList(
+                        request.senderId,
+                        request.receiverId));
 
-        db.collection("chats").document(chatId).set(chat);
+        db.collection("chats")
+                .document(chatId)
+                .set(chat)
+                .addOnSuccessListener(unused -> {
 
-        Toast.makeText(context, "Accepted", Toast.LENGTH_SHORT).show();
+                    db.collection("requests")
+                            .document(request.requestId)
+                            .update(
+                                    "status", "accepted",
+                                    "chatEnabled", true,
+                                    "chatId", chatId
+                            );
 
-        Intent intent = new Intent(context, ChatActivity.class);
-        intent.putExtra("chatId", chatId);
-        intent.putExtra("requestId", request.requestId);
-        context.startActivity(intent);
+                    Toast.makeText(
+                            context,
+                            "Request Accepted",
+                            Toast.LENGTH_SHORT
+                    ).show();
+
+                    Intent intent =
+                            new Intent(
+                                    context,
+                                    ChatActivity.class);
+
+                    intent.putExtra(
+                            "chatId",
+                            chatId);
+
+                    intent.putExtra(
+                            "requestId",
+                            request.requestId);
+
+                    context.startActivity(intent);
+                });
     }
 
     private void declineRequest(request request) {
+
         FirebaseFirestore.getInstance()
                 .collection("requests")
                 .document(request.requestId)
-                .update("status", "declined");
+                .update(
+                        "status", "declined",
+                        "chatEnabled", false
+                );
 
-        Toast.makeText(context, "Declined", Toast.LENGTH_SHORT).show();
+        Toast.makeText(
+                context,
+                "Request Declined",
+                Toast.LENGTH_SHORT
+        ).show();
     }
 
     @Override

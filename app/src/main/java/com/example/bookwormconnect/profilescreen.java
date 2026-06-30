@@ -16,11 +16,8 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 import java.util.ArrayList;
 import java.util.List;
-
 
 public class profilescreen extends AppCompatActivity {
     private static final String TAG = "ProfileActivity";
@@ -38,7 +35,6 @@ public class profilescreen extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         FirebaseApp.initializeApp(this);
-        // Initialize Firebase
         db = FirebaseFirestore.getInstance();
         currentUser = FirebaseAuth.getInstance().getCurrentUser();
 
@@ -159,36 +155,37 @@ public class profilescreen extends AppCompatActivity {
                 });
     }
     private void loadPosts() {
-        db.collection("users").document(profileUserId).collection("posts")
+
+        db.collection("posts")
+                .whereEqualTo("userId", profileUserId)
                 .get()
-                .addOnCompleteListener(new OnCompleteListener<QuerySnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<QuerySnapshot> task) {
-                        if (task.isSuccessful()) {
-                            posts.clear();
-                            for (QueryDocumentSnapshot document : task.getResult()) {
-                                String imageUrl = document.getString("url");
-                                String description = document.getString("description");
-                                posts.add(new Post(imageUrl, description));
-                            }
-                            postAdapter.notifyDataSetChanged();
-                            binding.postsCount.setText(posts.size() + "\nPosts");
-                        } else {
-                            Log.d(TAG, "Error getting posts: ", task.getException());
-                        }
+                .addOnSuccessListener(queryDocumentSnapshots -> {
+
+                    posts.clear();
+
+                    for (DocumentSnapshot document : queryDocumentSnapshots) {
+
+                        String imageUrl = document.getString("url");
+                        String description = document.getString("description");
+
+                        posts.add(new Post(imageUrl, description));
                     }
-                });
+
+                    postAdapter.notifyDataSetChanged();
+
+                    binding.postsCount.setText(posts.size() + "\nPosts");
+
+                })
+                .addOnFailureListener(e ->
+                        Log.e(TAG, "Error loading posts", e));
     }
     private void loadAverageRating(TextView averageRatingText) {
-
         db.collection("users")
                 .document(profileUserId)
                 .collection("ratings")
                 .get()
                 .addOnCompleteListener(task -> {
-
                     if (task.isSuccessful()) {
-
                         double total = 0;
                         int count = 0;
 

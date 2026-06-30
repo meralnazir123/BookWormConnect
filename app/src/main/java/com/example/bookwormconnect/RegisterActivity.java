@@ -1,6 +1,10 @@
 package com.example.bookwormconnect;
+import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
+import android.view.MotionEvent;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
@@ -26,6 +30,7 @@ public class RegisterActivity extends AppCompatActivity {
     Button button;
     FirebaseAuth mAuth;
     DatabaseReference databaseReference;
+    @SuppressLint("ClickableViewAccessibility")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -34,7 +39,69 @@ public class RegisterActivity extends AppCompatActivity {
         etemail = findViewById(R.id.mail);
         etusername = findViewById(R.id.usern);
         etpassword = findViewById(R.id.pwd);
+        etpassword.setOnTouchListener((v, event) -> {
+
+            if (event.getAction() == android.view.MotionEvent.ACTION_UP) {
+                if (event.getRawX() >=
+                        (etpassword.getRight()- etpassword.getCompoundDrawables()[2].getBounds().width())) {
+                    if (etpassword.getTransformationMethod()
+                            instanceof android.text.method.PasswordTransformationMethod) {
+
+                        etpassword.setTransformationMethod(
+                                android.text.method.HideReturnsTransformationMethod.getInstance());
+
+                        etpassword.setCompoundDrawablesWithIntrinsicBounds(
+                                0, 0, R.drawable.visibility_24dp_e3e3e3, 0);
+
+                    } else {
+
+                        etpassword.setTransformationMethod(
+                                android.text.method.PasswordTransformationMethod.getInstance());
+
+                        etpassword.setCompoundDrawablesWithIntrinsicBounds(
+                                0, 0, R.drawable.visibility_off_24dp_e3e3e3, 0);
+                    }
+
+                    etpassword.setSelection(etpassword.getText().length());
+                    return true;
+                }
+            }
+            return false;
+        });
         etcpassword = findViewById(R.id.cpwd);
+        etcpassword.setOnTouchListener((v, event) -> {
+
+            if (event.getAction() == MotionEvent.ACTION_UP) {
+
+                if (event.getRawX() >=
+                        (etcpassword.getRight()
+                                - etcpassword.getCompoundDrawables()[2].getBounds().width())) {
+
+                    if (etcpassword.getTransformationMethod()
+                            instanceof PasswordTransformationMethod) {
+
+                        etcpassword.setTransformationMethod(
+                                HideReturnsTransformationMethod.getInstance());
+
+                        etcpassword.setCompoundDrawablesWithIntrinsicBounds(
+                                0, 0, R.drawable.visibility_24dp_e3e3e3, 0);
+
+                    } else {
+
+                        etcpassword.setTransformationMethod(
+                                PasswordTransformationMethod.getInstance());
+
+                        etcpassword.setCompoundDrawablesWithIntrinsicBounds(
+                                0, 0, R.drawable.visibility_off_24dp_e3e3e3, 0);
+                    }
+
+                    etcpassword.setSelection(etcpassword.getText().length());
+                    return true;
+                }
+            }
+
+            return false;
+        });
         mAuth = FirebaseAuth.getInstance();
         databaseReference=FirebaseDatabase.getInstance().getReference("users");
         button = findViewById(R.id.button);
@@ -52,8 +119,6 @@ public class RegisterActivity extends AppCompatActivity {
             username = String.valueOf(etusername.getText());
             password = String.valueOf(etpassword.getText());
             cpassword = String.valueOf(etcpassword.getText());
-
-
             if (email.isEmpty() || username.isEmpty() || password.isEmpty() || cpassword.isEmpty()) {
                 Toast.makeText(RegisterActivity.this, "Please fill all fields", Toast.LENGTH_SHORT).show();
                 return;
@@ -66,47 +131,62 @@ public class RegisterActivity extends AppCompatActivity {
             }
             if (!password.equals(cpassword)) {
                 Toast.makeText(RegisterActivity.this, "Passwords do not match", Toast.LENGTH_SHORT).show();
-            }
-            else {
+            } else {
+                    FirebaseFirestore.getInstance()
+                            .collection("users")
+                            .whereEqualTo("username", username)
+                            .get()
+                            .addOnSuccessListener(queryDocumentSnapshots -> {
 
-                mAuth.createUserWithEmailAndPassword(email, password)
-                        .addOnCompleteListener(task -> {
-                            if (task.isSuccessful()) {
-                                FirebaseUser user = mAuth.getCurrentUser();
-                                if (user != null) {
-                                    FirebaseFirestore db = FirebaseFirestore.getInstance();
-
-                                    Map<String, Object> userData = new HashMap<>();
-                                    userData.put("username", username);
-                                    userData.put("email", email);
-                                    userData.put("bio", "");
-                                    userData.put("profileImageUrl", "");
-
-                                    db.collection("users")
-                                            .document(user.getUid())
-                                            .set(userData);
-                                    user.sendEmailVerification();
+                                if (!queryDocumentSnapshots.isEmpty()) {
                                     Toast.makeText(RegisterActivity.this,
-                                            "Verification email sent",
+                                            "Username already exists",
                                             Toast.LENGTH_SHORT).show();
+                                    return;
                                 }
-                                Toast.makeText(RegisterActivity.this,
-                                        "Registration successful. Please verify your email before login.Check for spam folder.",
-                                        Toast.LENGTH_LONG).show();
 
-                                mAuth.signOut();
+                                mAuth.createUserWithEmailAndPassword(email, password)
+                                        .addOnCompleteListener(task -> {
+                                            if (task.isSuccessful()) {
+                                                FirebaseUser user = mAuth.getCurrentUser();
+                                                if (user != null) {
+                                                    FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-                                startActivity(new Intent(RegisterActivity.this,
-                                        LoginActivity.class));
+                                                    Map<String, Object> userData = new HashMap<>();
+                                                    userData.put("username", username);
+                                                    userData.put("email", email);
+                                                    userData.put("bio", "");
+                                                    userData.put("profileImageUrl", "");
 
-                                finish();
-                            }
-                            else {
-                                Toast.makeText(RegisterActivity.this,  "Registration failed: " +
-                                        (task.getException()!=null?task.getException().getMessage():"Unknown error"), Toast.LENGTH_LONG).show();
-                            }
-                        });
-            }
-                    });
+                                                    db.collection("users")
+                                                            .document(user.getUid())
+                                                            .set(userData);
+                                                    DatabaseReference databaseReference =
+                                                            FirebaseDatabase.getInstance().getReference("users");
+
+                                                    databaseReference.child(user.getUid()).setValue(userData);
+                                                    user.sendEmailVerification();
+                                                    Toast.makeText(RegisterActivity.this,
+                                                            "Verification email sent",
+                                                            Toast.LENGTH_SHORT).show();
+                                                }
+                                                Toast.makeText(RegisterActivity.this,
+                                                        "Registration successful. Please verify your email before login.Check for spam folder.",
+                                                        Toast.LENGTH_LONG).show();
+
+                                                mAuth.signOut();
+
+                                                startActivity(new Intent(RegisterActivity.this,
+                                                        LoginActivity.class));
+
+                                                finish();
+                                            } else {
+                                                Toast.makeText(RegisterActivity.this, "Registration failed: " +
+                                                        (task.getException() != null ? task.getException().getMessage() : "Unknown error"), Toast.LENGTH_LONG).show();
+                                            }
+                                        });
+                            });
                 }
+            });
+        }
 }

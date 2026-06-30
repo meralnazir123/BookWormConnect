@@ -56,6 +56,7 @@
         app:layout_constraintVertical_bias="0.387" />
 
     <EditText
+        android:drawableEnd="@drawable/visibility_off_24dp_e3e3e3"
         android:id="@+id/pwd"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -74,6 +75,7 @@
 
     <EditText
         android:id="@+id/cpwd"
+        android:drawableEnd="@drawable/visibility_off_24dp_e3e3e3"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:ems="10"

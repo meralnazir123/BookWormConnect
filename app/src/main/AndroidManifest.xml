@@ -39,9 +39,6 @@
             android:name=".ChatActivity"
             android:exported="false" />
         <activity
-            android:name=".request_item"
-            android:exported="false" />
-        <activity
             android:name=".requestActivity"
             android:exported="false" />
         <activity

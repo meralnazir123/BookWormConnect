@@ -1,17 +1,14 @@
 package com.example.bookwormconnect;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
-
 import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
-
 import org.json.JSONArray;
 import org.json.JSONObject;
 import org.osmdroid.api.IMapController;
@@ -27,9 +24,7 @@ import java.net.URLEncoder;
 
 public class mapPicker extends AppCompatActivity {
     MapView map;
-    EditText selectedLocation;
     Button confirmBtn;
-
     double selectedLat, selectedLon;
     String selectedAddress = "";
 
@@ -43,11 +38,7 @@ public class mapPicker extends AppCompatActivity {
         EdgeToEdge.enable(this);
         Configuration.getInstance().setUserAgentValue(getPackageName());
         setContentView(R.layout.activity_map_picker);
-
-        TextView addressTv;
         EditText detailsEt;
-
-        addressTv = findViewById(R.id.addressTv);
         detailsEt = findViewById(R.id.detailsEt);
 
         EditText searchEt;

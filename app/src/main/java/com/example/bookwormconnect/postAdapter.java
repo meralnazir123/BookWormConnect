@@ -24,6 +24,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 public class postAdapter extends RecyclerView.Adapter<postAdapter.PostViewHolder> {
+
+    private static final int MAP_PICKER_REQUEST = 1001;
+
+    private EditText currentAddressInput;
+    private AlertDialog currentDialog;
     private String type;
     private List<postmodel> postList;
 
@@ -50,6 +55,21 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.PostViewHolder
         AlertDialog dialog = builder.create();
         dialog.show();
         EditText addressInput = view.findViewById(R.id.addressInput);
+        Button btnSelectLocation =
+                view.findViewById(R.id.btnSelectLocation);
+
+        currentAddressInput = addressInput;
+        currentDialog = dialog;
+        btnSelectLocation.setOnClickListener(v -> {
+
+            Intent intent = new Intent(
+                    itemView.getContext(),
+                    mapPicker.class);
+
+            ((android.app.Activity) itemView.getContext())
+                    .startActivityForResult(intent, MAP_PICKER_REQUEST);
+
+        });
         Button submitBtn = view.findViewById(R.id.submitBtn);
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();

@@ -48,6 +48,7 @@ dependencies {
     implementation(libs.googleid)
     implementation(libs.firebase.firestore)
     implementation(libs.firebase.storage)
+    implementation("com.google.android.material:material:1.12.0")
     implementation(libs.room.common.jvm)
     implementation(libs.firebase.database)
     implementation(libs.play.services.maps)

@@ -65,7 +65,7 @@ public class HomeActivity extends AppCompatActivity {
                     }
                 });
         recyclerView = findViewById(R.id.RecyclerV);
-        requestButton=findViewById(R.id.requestButton);
+        requestButton = findViewById(R.id.requestButton);
         postList = new ArrayList<>();
         adapter = new postAdapter(postList, "HOME");
         recyclerView.setLayoutManager(new LinearLayoutManager(this));
@@ -132,6 +132,7 @@ public class HomeActivity extends AppCompatActivity {
         toggle.syncState();
         navigationView.setNavigationItemSelectedListener(new NavigationView.OnNavigationItemSelectedListener() {
             Fragment fragment = null;
+
             @Override
             public boolean onNavigationItemSelected(@NonNull MenuItem item) {
                 int id = item.getItemId();
@@ -142,25 +143,31 @@ public class HomeActivity extends AppCompatActivity {
                     loadFragment(new MybooksFragment());
                 } else if (id == R.id.novels) {
                     fragment = CategoriesFragment.newInstance("Novel");
-                }
-                else if (id == R.id.textbooks) {
+                } else if (id == R.id.textbooks) {
                     fragment = CategoriesFragment.newInstance("Text Book");
                 } else if (id == R.id.home) {
+                    recyclerView.setVisibility(View.VISIBLE);
+                    searchView.setVisibility(View.VISIBLE);
+
+                    getSupportFragmentManager()
+                            .popBackStack(null,
+                                    FragmentManager.POP_BACK_STACK_INCLUSIVE);
                     drawer.closeDrawer(GravityCompat.START);
                     return true;
                 } else if (id == R.id.chat) {
+                    recyclerView.setVisibility(View.GONE);
+                    searchView.setVisibility(View.GONE);
                     loadFragment(new ChatlistFragment());
-                }
-                else if(id==R.id.request){
+                } else if (id == R.id.request) {
                     Intent intent = new Intent(HomeActivity.this, requestActivity.class);
                     startActivity(intent);
-                } else if (id==R.id.post) {
-                        if (checkSelfPermission(android.Manifest.permission.CAMERA)
-                                == PackageManager.PERMISSION_GRANTED) {
-                            openCameraChooser();
-                        } else {
-                            cameraPermissionLauncher.launch(android.Manifest.permission.CAMERA);
-                        }
+                } else if (id == R.id.post) {
+                    if (checkSelfPermission(android.Manifest.permission.CAMERA)
+                            == PackageManager.PERMISSION_GRANTED) {
+                        openCameraChooser();
+                    } else {
+                        cameraPermissionLauncher.launch(android.Manifest.permission.CAMERA);
+                    }
                 } else if (id == R.id.setting) {
                     loadFragment(new settingFragment());
                 } else if (id == R.id.logout) {
@@ -185,7 +192,6 @@ public class HomeActivity extends AppCompatActivity {
         });
 
     }
-
     private void filterList(String text) {
         ArrayList<postmodel> filteredList = new ArrayList<>();
 
@@ -301,16 +307,27 @@ public class HomeActivity extends AppCompatActivity {
     }
 
 
+    @Override
     public void onBackPressed() {
-        DrawerLayout drawer;
-        drawer = findViewById(R.id.drawerlayout);
+
+        DrawerLayout drawer = findViewById(R.id.drawerlayout);
+
         if (drawer.isDrawerOpen(GravityCompat.START)) {
+
             drawer.closeDrawer(GravityCompat.START);
+
+        } else if (getSupportFragmentManager().getBackStackEntryCount() > 0) {
+
+            getSupportFragmentManager().popBackStack();
+
+            recyclerView.setVisibility(View.VISIBLE);
+            searchView.setVisibility(View.VISIBLE);
+
         } else {
+
             super.onBackPressed();
         }
     }
-
     private void loadFragment(Fragment fragment) {
         FragmentManager fm = getSupportFragmentManager();
         FragmentTransaction ft = fm.beginTransaction();
@@ -318,15 +335,11 @@ public class HomeActivity extends AppCompatActivity {
         ft.addToBackStack(null);
         ft.commit();
     }
-
     public void hideSearchBar() {
         searchView.setVisibility(View.GONE);
     }
-
-
     protected void onResume() {
         super.onResume();
         loadImages();
-
     }
 }

@@ -62,6 +62,36 @@ public class LoginActivity extends AppCompatActivity {
         checkBox=findViewById(R.id.checkBox);
         UN = findViewById(R.id.Un);
         PW = findViewById(R.id.pwd);
+
+        PW.setOnTouchListener((v, event) -> {
+            if (event.getAction() == android.view.MotionEvent.ACTION_UP) {
+                if (event.getRawX() >=
+                        (PW.getRight()- PW.getCompoundDrawables()[2].getBounds().width())) {
+                    if (PW.getTransformationMethod()
+                            instanceof android.text.method.PasswordTransformationMethod) {
+
+                        PW.setTransformationMethod(
+                                android.text.method.HideReturnsTransformationMethod.getInstance());
+
+                        PW.setCompoundDrawablesWithIntrinsicBounds(
+                                0, 0, R.drawable.visibility_24dp_e3e3e3, 0);
+
+                    } else {
+
+                        PW.setTransformationMethod(
+                                android.text.method.PasswordTransformationMethod.getInstance());
+
+                        PW.setCompoundDrawablesWithIntrinsicBounds(
+                                0, 0, R.drawable.visibility_off_24dp_e3e3e3, 0);
+                    }
+
+                    PW.setSelection(PW.getText().length());
+                    return true;
+                }
+            }
+            return false;
+        });
+
         button = findViewById(R.id.button);
         registerTV = findViewById(R.id.RegisterTV);
         forgetPW=findViewById(R.id.forgetPW);

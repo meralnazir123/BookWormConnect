@@ -1,4 +1,5 @@
 package com.example.bookwormconnect;
+import android.content.Intent;
 import android.net.Uri;
 import android.os.Bundle;
 import android.widget.Button;
@@ -24,20 +25,23 @@ import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import java.util.ArrayList;
 public class ChatActivity extends AppCompatActivity {
+    TextView txtAddress;
 
     private RecyclerView chatRecycler;
     private LinearLayout optionsLayout;
     private TextView ChatUsername;
     private ImageView imgChatProfile;
     private Button btnAvailable;
+
     private Button btnMeet;
     private Button btnDeposit;
 
     private ImageButton btnCamera;
-
+private ImageButton deposit;
     private String chatId;
     private String requestId;
     private String currentUserId;
+    private TextView txtDepositStatus;
 
     private ArrayList<ChatMessage> messages;
     private ChatAdapter adapter;
@@ -48,6 +52,8 @@ public class ChatActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_chat);
+
+        txtAddress=findViewById(R.id.txtAddress);
 
         chatRecycler = findViewById(R.id.chatRecycler);
         ChatUsername = findViewById(R.id.chatUsername);
@@ -61,6 +67,15 @@ public class ChatActivity extends AppCompatActivity {
         String otherUserId = getIntent().getStringExtra("otherUserId");
         chatId = getIntent().getStringExtra("chatId");
         requestId = getIntent().getStringExtra("requestId");
+        txtDepositStatus=findViewById(R.id.txtDepositStatus);
+        deposit=findViewById(R.id.Deposit);
+        deposit.setOnClickListener(v -> {
+            Intent intent = new Intent(ChatActivity.this, DepositActivity.class);
+
+            intent.putExtra("chatId", chatId);
+            intent.putExtra("requestId", requestId);
+            startActivity(intent);
+        });
 
         if (otherUserId != null) {
 
@@ -89,6 +104,7 @@ public class ChatActivity extends AppCompatActivity {
         currentUserId = FirebaseAuth.getInstance()
                 .getCurrentUser()
                 .getUid();
+        checkDepositStatus();
         FirebaseFirestore.getInstance()
                 .collection("requests")
                 .document(requestId)
@@ -96,6 +112,12 @@ public class ChatActivity extends AppCompatActivity {
                 .addOnSuccessListener(document -> {
 
                     if (document.exists()) {
+
+                        String address = document.getString("address");
+
+                        if (address != null) {
+                            txtAddress.setText("Address: "+ address);
+                        }
 
                         String senderId = document.getString("senderId");
 
@@ -220,6 +242,64 @@ public class ChatActivity extends AppCompatActivity {
                             .child("messages")
                             .child(key)
                             .setValue(msg);
+                });
+    }
+
+    private void checkDepositStatus() {
+
+        if (requestId == null) {
+            return;
+        }
+
+        FirebaseFirestore.getInstance()
+                .collection("deposits")
+                .whereEqualTo("requestId", requestId)
+
+                .limit(1)
+                .addSnapshotListener((snapshot, error) -> {
+
+                    if (error != null) {
+                        return;
+                    }
+
+                    if (snapshot == null || snapshot.isEmpty()) {
+
+                        txtDepositStatus.setText("Deposit: Not Paid");
+                        deposit.setEnabled(true);
+
+                        return;
+                    }
+
+                    String status =
+                            snapshot.getDocuments()
+                                    .get(0)
+                                    .getString("status");
+
+                    if ("pending".equals(status)) {
+
+                        txtDepositStatus.setText(
+                                "Deposit: Pending Verification"
+                        );
+
+                        deposit.setEnabled(false);
+
+                    } else if ("verified".equals(status)) {
+
+                        txtDepositStatus.setText(
+                                "Deposit: Verified"
+                        );
+
+                        deposit.setEnabled(false);
+
+                    } else if ("rejected".equals(status)) {
+
+                        txtDepositStatus.setText(
+                                "Deposit: Rejected"
+                        );
+
+                        deposit.setEnabled(true);
+
+                    }
                 });
     }
     private void loadMessages() {

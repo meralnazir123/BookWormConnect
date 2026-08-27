@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="16dp"
+    android:backgroundTint="@color/black"
+    android:layout_marginBottom="12dp"
+    android:background="@android:color/white">
+
+    <TextView
+        android:textColor="#fff3c2"
+        android:id="@+id/txtAdminBook"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Book"
+        android:textSize="17sp"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:textColor="#fff3c2"
+        android:id="@+id/amountTv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Amount: Rs. 0"
+        android:layout_marginTop="6dp"/>
+
+    <TextView
+        android:textColor="#fff3c2"
+        android:id="@+id/referenceTv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Reference: 123456"
+        android:layout_marginTop="6dp"/>
+
+    <TextView
+        android:textColor="#fff3c2"
+        android:id="@+id/borrowerTv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Borrower"
+        android:layout_marginTop="6dp"/>
+
+    <TextView
+        android:textColor="#fff3c2"
+        android:id="@+id/statusTv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Status: pending"
+        android:textStyle="bold"
+        android:layout_marginTop="6dp"/>
+
+    <LinearLayout
+        android:textColor="#fff3c2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="12dp">
+
+        <Button
+            android:textColor="@color/black"
+            android:id="@+id/approveBtn"
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:backgroundTint="#fff3c2"
+            android:text="Verify"/>
+
+        <Button
+            android:textColor="@color/black"
+            android:id="@+id/rejectBtn"
+            android:layout_width="0dp"
+            android:backgroundTint="#fff3c2"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:layout_marginStart="8dp"
+            android:text="Reject"/>
+
+    </LinearLayout>
+
+</LinearLayout>

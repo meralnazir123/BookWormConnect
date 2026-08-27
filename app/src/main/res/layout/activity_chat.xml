@@ -1,10 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
-<LinearLayout
+<LinearLayout xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/optionsLayout"
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="vertical"
     android:layout_width="match_parent"
+    android:layout_marginTop="10dp"
     android:layout_height="match_parent">
 
     <LinearLayout
@@ -30,7 +31,42 @@
             android:textSize="20sp"
             android:textStyle="bold"/>
 
+        <ImageButton
+            android:id="@+id/Deposit"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:layout_marginLeft="120dp"
+            android:src="@drawable/deposit"
+            tools:ignore="SpeakableTextPresentCheck" />
+
+        <ImageButton
+            android:id="@+id/btnCamera"
+            android:layout_width="60dp"
+            android:layout_height="60dp"
+            android:src="@android:drawable/ic_menu_camera"
+            tools:ignore="SpeakableTextPresentCheck" />
+
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/txtAddress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Address"
+        android:textSize="15sp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="2dp"/>
+
+    <TextView
+        android:id="@+id/txtDepositStatus"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Deposit Status: Not Paid"
+        android:textSize="15sp"
+        android:textStyle="bold"
+        android:layout_marginStart="10dp"
+        android:layout_marginTop="6dp"
+        android:layout_marginBottom="4dp"/>
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chatRecycler"
         android:layout_width="match_parent"
@@ -62,19 +98,11 @@
                 android:id="@+id/btnDeposit"
                 android:text="I have sent the deposit."
                 android:layout_width="wrap_content"
-                android:layout_height="wrap_content"/>
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"/>
 
         </LinearLayout>
 
     </HorizontalScrollView>
-
-    <ImageButton
-
-        android:paddingBottom="15dp"
-        android:id="@+id/btnCamera"
-        android:layout_width="60dp"
-        android:layout_height="60dp"
-        android:layout_gravity="center"
-        android:src="@android:drawable/ic_menu_camera"/>
 
 </LinearLayout>

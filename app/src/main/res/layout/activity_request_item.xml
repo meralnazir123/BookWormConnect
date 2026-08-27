@@ -1,22 +1,29 @@
-<LinearLayout
-    android:orientation="vertical"
+<LinearLayout android:orientation="vertical"
     android:padding="12dp"
+    android:layout_marginTop="10dp"
     android:layout_width="match_parent"
     android:layout_height="wrap_content"
-    android:background="@drawable/background1"
-    xmlns:android="http://schemas.android.com/apk/res/android">
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto">
 
     <TextView
         android:id="@+id/nameTv"
-        android:textStyle="bold"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:textStyle="bold" />
 
     <TextView
         android:id="@+id/addressTv"
-        android:layout_marginTop="10dp"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"/>
+        android:layout_height="wrap_content"
+        android:layout_marginTop="10dp" />
+
+    <TextView
+        android:id="@+id/bookTv"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#FFFFFF"
+        android:textSize="13sp"/>
 
     <Button
         android:id="@+id/acceptBtn"
@@ -44,4 +51,14 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>
 
+    <com.google.android.material.divider.MaterialDivider
+        android:layout_width="match_parent"
+        android:layout_height="1dp"
+        android:id="@+id/divider2"
+        android:layout_marginTop="2dp"
+        android:enabled="false"
+        app:dividerColor="@color/white"
+        app:actionLayout="@layout/divider">
+
+    </com.google.android.material.divider.MaterialDivider>
 </LinearLayout>

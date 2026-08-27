@@ -74,4 +74,10 @@
         android:id="@+id/logout"
         android:icon="@drawable/logout"
         android:title="Logout" />
+
+    <item
+        android:id="@+id/admin"
+        android:icon="@drawable/request"
+        android:title="Admin"
+        />
 </menu>

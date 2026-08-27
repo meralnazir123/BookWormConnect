@@ -30,12 +30,14 @@ public class ChatListAdapter extends RecyclerView.Adapter<ChatListAdapter.ViewHo
             extends RecyclerView.ViewHolder {
 
         TextView txtUser;
+        TextView bookDescription;
 ImageView image;
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
 
             txtUser = itemView.findViewById(R.id.txtUsername);
             image=itemView.findViewById(R.id.imgProfile);
+            bookDescription=itemView.findViewById(R.id.txtBookDescription);
         }
     }
 
@@ -62,6 +64,8 @@ ImageView image;
         ChatListItem item = chatList.get(position);
 
         holder.txtUser.setText(item.getUsername());
+        holder.bookDescription.setText(item.getBookDescription());
+
 
         FirebaseFirestore.getInstance()
                 .collection("users")

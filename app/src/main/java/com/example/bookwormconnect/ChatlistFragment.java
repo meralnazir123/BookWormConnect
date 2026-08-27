@@ -63,7 +63,7 @@ public class ChatlistFragment extends Fragment {
                             .getDocuments()
                             .forEach(doc -> {
 
-                                ArrayList<String> participants =(ArrayList<String>)doc.get("participants");
+                                ArrayList<String> participants = (ArrayList<String>) doc.get("participants");
                                 if (participants != null &&
                                         participants.contains(currentUid)) {
                                     String otherUserId;
@@ -81,27 +81,41 @@ public class ChatlistFragment extends Fragment {
                                             .document(otherUserId)
                                             .get()
                                             .addOnSuccessListener(userDoc -> {
-                                                String username = "Unknown User";
+                                                final String username;
+
                                                 if (userDoc.exists()
                                                         && userDoc.getString("username") != null) {
                                                     username = userDoc.getString("username");
+                                                } else {
+                                                    username = "Unknown User";
                                                 }
-                                                chatList.add(
-                                                        new ChatListItem(
-                                                                doc.getId(),
-                                                                otherUserId,
-                                                                username,
-                                                                requestId
-                                                        )
-                                                );
+                                                FirebaseFirestore.getInstance()
+                                                        .collection("requests")
+                                                        .document(requestId)
+                                                        .get()
+                                                        .addOnSuccessListener(requestDoc -> {
 
-                                                adapter.notifyDataSetChanged();
+                                                            String description = "";
+
+                                                            if (requestDoc.exists()) {
+                                                                description = requestDoc.getString("bookDescription");
+                                                            }
+
+                                                            chatList.add(
+                                                                    new ChatListItem(
+                                                                            doc.getId(),
+                                                                            otherUserId,
+                                                                            username,
+                                                                            requestId,
+                                                                            description
+                                                                    )
+                                                            );
+
+                                                            adapter.notifyDataSetChanged();
+                                                        });
                                             });
                                 }
+
                             });
-
-                    adapter.notifyDataSetChanged();
                 });
-    }
-
-}
+    }}

@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="utf-8"?>
+  <LinearLayout
+      xmlns:android="http://schemas.android.com/apk/res/android"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:orientation="vertical"
+      android:padding="24dp"
+      android:background="@drawable/background1">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Pay Deposit"
+        android:textColor="#fff3c2"
+        android:textSize="30sp"
+        android:textStyle="bold"
+        android:gravity="center"
+        android:layout_marginTop="15dp"
+        android:layout_marginBottom="24dp"/>
+
+    <TextView
+        android:textColor="#fff3c2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Book"
+        android:textStyle="bold"/>
+
+    <TextView
+        android:layout_marginTop="5dp"
+        android:textColor="#fff3c2"
+        android:id="@+id/txtBook"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"/>
+
+    <TextView
+        android:id="@+id/txtDeposit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="#fff3c2"
+        android:text="Deposit Amount: Loading..."
+        android:textStyle="bold"
+        android:layout_marginBottom="24dp"/>
+
+    <TextView
+        android:textColor="#fff3c2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Bank Transfer Details"
+
+        android:textStyle="bold"
+        android:layout_marginBottom="16dp"/>
+
+    <TextView
+        android:textColor="#fff3c2"
+        android:id="@+id/txtBank"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Bank: Your Bank Name"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:textColor="#fff3c2"
+        android:id="@+id/txtAccountTitle"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Account Title: BookWormConnect Admin"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:textColor="#fff3c2"
+        android:id="@+id/txtAccountNumber"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Account Number: XXXXXXXX"
+        android:textSize="16sp"
+        android:layout_marginBottom="8dp"/>
+
+    <TextView
+        android:textColor="#fff3c2"
+        android:id="@+id/txtIBAN"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="IBAN: PKXXXXXXXXXXXXXXXX"
+        android:textSize="16sp"
+        android:layout_marginBottom="24dp"/>
+
+    <TextView
+        android:textColor="#fff3c2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="After making the bank transfer, enter the transaction/reference number below."
+        android:textSize="14sp"
+        android:layout_marginBottom="12dp"/>
+
+    <EditText
+        android:textColor="#fff3c2"
+        android:id="@+id/etReference"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Transaction / Reference Number"
+        android:inputType="text"
+        android:textColorHint="@color/white"
+        android:padding="12dp"/>
+
+    <Button
+        android:id="@+id/btnSubmit"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Submit Payment"
+        android:textColor="@color/black"
+        android:backgroundTint="#fff3c2"
+        android:layout_marginTop="24dp"/>
+
+  </LinearLayout>
+

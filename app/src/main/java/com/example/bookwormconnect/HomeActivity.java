@@ -108,6 +108,18 @@ public class HomeActivity extends AppCompatActivity {
         DrawerLayout drawer = findViewById(R.id.drawerlayout);
         Toolbar toolbar = findViewById(R.id.toolbar);
         NavigationView navigationView = findViewById(R.id.navD);
+        String currentUserId = FirebaseAuth.getInstance().getUid();
+
+        MenuItem adminItem = navigationView.getMenu().findItem(R.id.admin);
+
+        if (currentUserId != null &&
+                currentUserId.equals("8irufe7ft4PmqWvUBxMWeH7Y9oI3")) {
+
+            adminItem.setVisible(true);
+
+        } else {
+            adminItem.setVisible(false);
+        }
         searchView.clearFocus();
         searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
             @Override
@@ -170,6 +182,9 @@ public class HomeActivity extends AppCompatActivity {
                     }
                 } else if (id == R.id.setting) {
                     loadFragment(new settingFragment());
+                }else if (id == R.id.admin) {
+                    Intent intent = new Intent(HomeActivity.this, AdminActivity.class);
+                    startActivity(intent);
                 } else if (id == R.id.logout) {
                     FirebaseAuth.getInstance().signOut();
                     Intent intent = new Intent(HomeActivity.this, LoginActivity.class);

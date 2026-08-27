@@ -2,7 +2,6 @@ package com.example.bookwormconnect;
 
 import android.os.Bundle;
 
-import androidx.activity.EdgeToEdge;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -18,6 +17,7 @@ public class requestActivity extends AppCompatActivity {
 
     RecyclerView recyclerView;
     requestAdapter adapter;
+
     List<request> requestList = new ArrayList<>();
 
     FirebaseFirestore db;
@@ -25,7 +25,7 @@ public class requestActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        EdgeToEdge.enable(this);
+       // EdgeToEdge.enable(this);
         setContentView(R.layout.activity_request);
 
         recyclerView = findViewById(R.id.recyclerView);

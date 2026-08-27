@@ -45,7 +45,7 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.PostViewHolder
 
         return new PostViewHolder(view);
     }
-    private void showRequestDialog(View itemView, String bookId, String ownerId) {
+    private void showRequestDialog(View itemView, String bookId, String ownerId, String Description) {
 
         AlertDialog.Builder builder = new AlertDialog.Builder(itemView.getContext());
         View view = LayoutInflater.from(itemView.getContext())
@@ -95,6 +95,7 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.PostViewHolder
             request.put("address", address);
             request.put("status", "pending");
             request.put("chatEnabled", false);
+            request.put("bookDescription", Description);
             request.put("timestamp", FieldValue.serverTimestamp());
 
             db.collection("requests")
@@ -168,10 +169,11 @@ public class postAdapter extends RecyclerView.Adapter<postAdapter.PostViewHolder
             holder.deleteBtn.setVisibility(View.GONE);
         }
         holder.requestBtn.setOnClickListener(v -> {
-            String bookId = post.docId;      // or your book ID field
+            String bookId = post.docId;
             String ownerId = post.userId;
 
-            showRequestDialog(holder.itemView, bookId, ownerId);
+            showRequestDialog(holder.itemView, bookId, ownerId,
+                    post.description);
         });
 holder.deleteBtn.setOnClickListener(v -> new AlertDialog.Builder(holder.itemView.getContext()).setTitle("Delete Post")
         .setMessage("Are you sure?").setPositiveButton("Delete", (dialog, which) -> {

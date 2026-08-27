@@ -13,6 +13,13 @@
         android:scaleType="centerCrop"
         android:src="@drawable/user"/>
 
+    <LinearLayout
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="16dp"
+        android:layout_weight="1"
+        android:orientation="vertical">
+
     <TextView
         android:id="@+id/txtUsername"
         android:layout_width="wrap_content"
@@ -22,5 +29,15 @@
         android:textSize="18sp"
         android:textStyle="bold"
         android:textColor="@android:color/white"/>
+    <TextView
+        android:id="@+id/txtBookDescription"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textColor="#CCCCCC"
+        android:layout_marginStart="16dp"
+        android:textSize="14sp"
+        android:maxLines="1"
+        android:ellipsize="end"/>
+    </LinearLayout>
 
 </LinearLayout>

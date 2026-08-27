@@ -48,14 +48,28 @@ public class requestAdapter extends RecyclerView.Adapter<requestAdapter.ViewHold
             holder.declineBtn.setVisibility(View.GONE);
         }
         holder.statusTv.setText(request.status);
-
+        holder.bookTv.setText(request.bookDescription);
 
         holder.addressTv.setText(
                 request.address != null ? "Address: " + request.address : "No Address"
         );
         holder.statusTv.setText(
-                request.status != null ? request.status : "pending"
+                request.status != null ? "Status: "+request.status : "pending"
         );
+
+
+        FirebaseFirestore.getInstance()
+                .collection("users")
+                .document(request.senderId)
+                .get()
+                .addOnSuccessListener(document -> {
+
+                    if (document.exists()) {
+
+                        holder.nameTv.setText(document.getString("username"));
+
+                    }
+                });
 
         holder.acceptBtn.setOnClickListener(v -> acceptRequest(request));
         holder.declineBtn.setOnClickListener(v -> declineRequest(request));
@@ -75,6 +89,7 @@ public class requestAdapter extends RecyclerView.Adapter<requestAdapter.ViewHold
         chat.put("requestId", request.requestId);
         chat.put("senderId", request.senderId);
         chat.put("receiverId", request.receiverId);
+        chat.put("bookDescription", request.bookDescription);
         chat.put("participants",
                 Arrays.asList(
                         request.senderId,
@@ -141,10 +156,12 @@ public class requestAdapter extends RecyclerView.Adapter<requestAdapter.ViewHold
     public static class ViewHolder extends RecyclerView.ViewHolder {
 
         TextView nameTv, addressTv,statusTv;
+        TextView bookTv;
         Button acceptBtn, declineBtn;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
+            bookTv = itemView.findViewById(R.id.bookTv);
             statusTv = itemView.findViewById(R.id.statusTv);
             nameTv = itemView.findViewById(R.id.nameTv);
             addressTv = itemView.findViewById(R.id.addressTv);

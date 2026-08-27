@@ -6,6 +6,7 @@ public class ChatListItem {
     private String otherUserId;
     private String username;
     private String requestId;
+    private String bookDescription;
 
     public ChatListItem(){}
 
@@ -13,12 +14,14 @@ public class ChatListItem {
             String chatId,
             String otherUserId,
             String username,
-            String requestId) {
+            String requestId,
+            String bookDescription) {
 
         this.chatId = chatId;
         this.otherUserId = otherUserId;
         this.username = username;
         this.requestId = requestId;
+        this.bookDescription = bookDescription;
     }
 
     public String getChatId() {
@@ -35,5 +38,10 @@ public class ChatListItem {
 
     public String getRequestId() {
         return requestId;
+    }
+
+    public String getBookDescription() {
+        return bookDescription;
+
     }
 }

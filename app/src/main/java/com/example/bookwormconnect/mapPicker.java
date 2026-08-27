@@ -36,7 +36,9 @@ public class mapPicker extends AppCompatActivity {
                 getSharedPreferences("osmdroid", MODE_PRIVATE)
         );
         EdgeToEdge.enable(this);
-        Configuration.getInstance().setUserAgentValue(getPackageName());
+        Configuration.getInstance().setUserAgentValue(
+                "BookWormConnect/1.0 (mahnoorbutt214@gmail.com)"
+        );
         setContentView(R.layout.activity_map_picker);
         EditText detailsEt;
         detailsEt = findViewById(R.id.detailsEt);
@@ -122,7 +124,7 @@ public class mapPicker extends AppCompatActivity {
 
                 Request request = new Request.Builder()
                         .url(url)
-                        .header("User-Agent", "YourAppName")
+                        .header("User-Agent", "BookWormConnect/1.0 (mahnoorbutt214@gmail.com)")
                         .build();
 
                 Response response = client.newCall(request).execute();
@@ -176,7 +178,7 @@ public class mapPicker extends AppCompatActivity {
 
                 Request request = new Request.Builder()
                         .url(url)
-                        .header("User-Agent", "YourAppName")
+                        .header("User-Agent", "BookWormConnect/1.0 (mahnoorbutt214@gmail.com)")
                         .build();
 
                 Response response = client.newCall(request).execute();

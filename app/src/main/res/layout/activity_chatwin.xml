@@ -86,7 +86,7 @@
 
 
         <androidx.cardview.widget.CardView
-            android:layout_width="match_parent"
+            android:layout_width="291dp"
             android:layout_height="45.50dp"
             android:layout_marginStart="6.50dp"
             android:layout_marginEnd="9.10dp"
@@ -96,7 +96,7 @@
 
             <EditText
                 android:id="@+id/textmsg"
-                android:layout_width="309dp"
+                android:layout_width="200dp"
                 android:layout_height="45dp"
                 android:layout_gravity="center"
                 android:layout_marginLeft="20dp"
@@ -105,6 +105,24 @@
                 android:fontFamily="@font/poppins_regular"
                 android:hint="type msg here..."
                 android:paddingStart="13dp" />
+
+        </androidx.cardview.widget.CardView>
+
+        <androidx.cardview.widget.CardView
+            android:id="@+id/cambtn"
+            android:layout_width="100.50dp"
+            android:layout_height="45.50dp"
+            android:layout_marginStart="6.50dp"
+            android:layout_marginEnd="6.50dp"
+            android:layout_weight="1"
+            android:background="@color/white"
+            app:cardCornerRadius="32.50dp">
+
+            <ImageView
+                android:layout_width="37dp"
+                android:layout_height="27dp"
+                android:layout_gravity="center"
+                android:background="@drawable/camera" />
 
         </androidx.cardview.widget.CardView>
 
@@ -121,10 +139,10 @@
             app:cardCornerRadius="32.50dp">
 
             <ImageView
-                android:layout_width="19.50dp"
-                android:layout_height="19.50dp"
+                android:layout_width="37dp"
+                android:layout_height="23dp"
                 android:layout_gravity="center"
-                android:background="@drawable/sendbut"/>
+                android:background="@drawable/sendbut" />
 
         </androidx.cardview.widget.CardView>
 

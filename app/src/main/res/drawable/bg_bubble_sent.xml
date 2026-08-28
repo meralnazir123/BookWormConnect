@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Sent message bubble: warm brown, rounded except top-right corner -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+    android:shape="rectangle">
+    <solid android:color="#6D4C41"/>
+    <corners
+        android:topLeftRadius="18dp"
+        android:topRightRadius="4dp"
+        android:bottomLeftRadius="18dp"
+        android:bottomRightRadius="18dp"/>
+</shape>

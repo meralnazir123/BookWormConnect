@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#23140F">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        android:padding="24dp"
+        android:gravity="center_horizontal">
+
+
+        <ImageView
+            android:id="@+id/aboutLogo"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_marginTop="25dp"
+            android:src="@drawable/book"
+            android:contentDescription="BookwormConnect Logo" />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="18dp"
+            android:text="BookwormConnect"
+            android:textSize="28sp"
+            android:textStyle="bold"
+            android:textColor="#E2DDDD" />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:text="Connect. Read. Share."
+            android:textSize="16sp"
+            android:textColor="#777777" />
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="35dp"
+            android:text="About BookwormConnect"
+            android:textSize="22sp"
+            android:textStyle="bold"
+            android:textColor="#E2DDDD" />
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:text="BookwormConnect is a place for people who love books and enjoy sharing their reading journey with others."
+            android:textSize="16sp"
+            android:textColor="#555555"
+            android:lineSpacingExtra="5dp" />
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:text="Our Purpose"
+            android:textColor="#E2DDDD"
+            android:textSize="20sp"
+            android:textStyle="bold" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="BookwormConnect is designed to bring readers together. Discover new books, share your thoughts, connect with fellow book lovers, and make reading a more social experience."
+            android:textSize="16sp"
+            android:textColor="#555555"
+            android:lineSpacingExtra="5dp" />
+
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="28dp"
+            android:text="What You Can Do"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:textColor="#E2DDDD" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:text="• Discover books you may love&#10;&#10;• Share your favorite reads&#10;&#10;• Connect with other readers&#10;&#10;• Discuss books and exchange recommendations&#10;&#10;• Keep track of your reading journey"
+            android:textSize="16sp"
+            android:textColor="#555555" />
+
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="35dp"
+            android:layout_marginBottom="30dp"
+            android:text="Version 1.0"
+            android:textSize="14sp"
+            android:textColor="#888888" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginBottom="30dp"
+            android:textAlignment="center"
+            android:text="CONTACT US&#10;&#10;AT: bwconnect@gmail.com"
+            android:lineSpacingExtra="-3dp"
+            android:textStyle="bold"
+            android:textSize="14sp"
+            android:textColor="#888888" />
+
+    </LinearLayout>
+
+</ScrollView>

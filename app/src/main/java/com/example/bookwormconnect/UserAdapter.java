@@ -1,77 +1,91 @@
 package com.example.bookwormconnect;
 
-import android.annotation.SuppressLint;
+import android.content.Context;
 import android.content.Intent;
 import android.view.LayoutInflater;
-import android.view.TextureView;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.TextView;
 
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.firebase.firestore.auth.User;
-import com.squareup.picasso.Picasso;
+import com.bumptech.glide.Glide;
 
-import java.util.ArrayList;
-
-import javax.xml.namespace.QName;
+import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-public class UserAdapter extends RecyclerView.Adapter<UserAdapter.viewwholder> {
-    ChatActivity chatActivity;
-    ArrayList<Users> userArrayList;
-    public UserAdapter(ChatActivity chatActivity, ArrayList<Users> userArrayList) {
-        this.chatActivity=chatActivity;
-        this.userArrayList=userArrayList;
+/**
+ * UserAdapter — shows a list of users in the chat list screen.
+ * Clicking a user opens ChatActivity with the correct chatId and requestId.
+ *
+ * Layout used: res/layout/row_users.xml  (created below)
+ *
+ * Fields read from UserModel:
+ *   uid, username, profilepic, requestId
+ */
+public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
 
+    private final Context       context;
+    private final List<UserModel> userList;
+
+    public UserAdapter(Context context, List<UserModel> userList) {
+        this.context  = context;
+        this.userList = userList;
     }
 
     @NonNull
     @Override
-    public viewwholder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(chatActivity).inflate(R.layout.user_item,parent,false);
-        return new viewwholder(view);
+    public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        // ✅ Use parent.getContext() — NOT ChatActivity directly
+        View view = LayoutInflater.from(parent.getContext())
+                .inflate(R.layout.row_users, parent, false);
+        return new UserViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull viewwholder holder, int position) {
+    public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
+        UserModel user = userList.get(position);
 
-        Users users = userArrayList.get(position);
-        holder.username.setTextDirection(Integer.parseInt(users.userName));
-        holder.userstatus.setTextDirection(Integer.parseInt(users.status));
-        Picasso.get().load(users.profilepic).into(holder.userimg);
+        // Set username
+        holder.tvUsername.setText(
+                user.getUsername() != null ? user.getUsername() : "Unknown User"
+        );
 
-        holder.itemView.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-                Intent intent = new Intent(chatActivity, chatwin.class);
-                String name = "";
-                intent.putExtra(name;:"nameeee",users.getUserName());
-                intent.putExtra(name;:"receiverImg",users.getProfilepic());
-                intent.putExtra(name;:"uid",users.getUserId());
-                chatActivity.startActivity(intent);
-            }
+        // Load profile picture with Glide
+        if (user.getProfilepic() != null && !user.getProfilepic().isEmpty()) {
+            Glide.with(context)
+                    .load(user.getProfilepic())
+                    .placeholder(R.drawable.user)
+                    .into(holder.profileImage);
+        } else {
+            holder.profileImage.setImageResource(R.drawable.user);
+        }
+
+        // ✅ On click — open ChatActivity (NOT chatwin)
+        holder.itemView.setOnClickListener(v -> {
+            Intent intent = new Intent(context, ChatActivity.class);
+            intent.putExtra("chatId",    user.getChatId());
+            intent.putExtra("requestId", user.getRequestId());
+            context.startActivity(intent);
         });
-
     }
 
     @Override
     public int getItemCount() {
-        return userArrayList.size();
+        return userList != null ? userList.size() : 0;
     }
 
-    public class viewwholder extends RecyclerView.ViewHolder {
-        CircleImageView userimg;
-        TextureView username;
-        TextureView userstatus;
-        @SuppressLint("WrongViewCast")
-        public viewwholder(@NonNull View itemView) {
+    // ── ViewHolder ─────────────────────────────────────────────────────
+    static class UserViewHolder extends RecyclerView.ViewHolder {
+        CircleImageView profileImage;
+        TextView        tvUsername;
+
+        UserViewHolder(@NonNull View itemView) {
             super(itemView);
-            userimg = itemView.findViewById(R.id.userimg);
-            username = itemView.findViewById(R.id.username);
-            userstatus = itemView.findViewById(R.id.userstatus);
+            profileImage = itemView.findViewById(R.id.profileImage);
+            tvUsername   = itemView.findViewById(R.id.tvUsername);
         }
     }
 }

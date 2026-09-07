@@ -1,57 +1,91 @@
 [versions]
-agp = "8.8.2"
-circleimageview = "3.1.0"
-compiler = "4.16.0"
-firebaseMessaging = "25.0.2"
-junit = "4.13.2"
-junitVersion = "1.2.1"
-espressoCore = "3.6.1"
-appcompat = "1.7.1"
-material = "1.13.0"
-activity = "1.10.1"
-constraintlayout = "2.2.1"
-googleGmsGoogleServices = "4.4.4"
-firebaseAuth = "24.0.1"
-credentials = "1.5.0"
-credentialsPlayServicesAuth = "1.5.0"
-googleid = "1.1.1"
-firebaseFirestore = "26.0.2"
-firebaseStorage = "22.0.1"
-okhttp = "4.12.0"
-osmdroidAndroid = "6.1.18"
-recyclerview = "1.4.0"
-roomCommonJvm = "2.8.4"
-firebaseDatabase = "22.0.1"
-playServicesMaps = "20.0.0"
+agp                       = "8.8.2"
+googleGmsGoogleServices   = "4.4.2"
+
+# AndroidX
+appcompat                 = "1.7.0"
+material                  = "1.12.0"
+activity                  = "1.9.3"
+constraintlayout          = "2.2.1"
+recyclerview              = "1.3.2"
+credentials               = "1.3.0"
+credentialsPlayServicesAuth = "1.3.0"
+
+# Firebase (versions controlled by BOM — individual versions removed)
+firebaseBom               = "33.7.0"
+firebaseMessaging         = "23.4.1"
+
+# Google
+googleid                  = "1.1.1"
+playServicesMaps          = "19.0.0"
+
+# Image loading
+glide                     = "4.16.0"
+picasso                   = "2.8"
+circleimageview           = "3.1.0"
+
+# Maps
+osmdroidAndroid           = "6.1.18"
+
+# Networking
+okhttp                    = "4.12.0"
+
+# Scalable size units (for responsive layouts)
+sdp                       = "1.1.1"
+
+# Testing
+junit                     = "4.13.2"
+junitVersion              = "1.2.1"
+espressoCore              = "3.6.1"
+firebaseFirestore = "26.6.0"
+
 
 [libraries]
-circleimageview = { module = "de.hdodenhof:circleimageview", version.ref = "circleimageview" }
-compiler = { module = "com.github.bumptech.glide:compiler", version.ref = "compiler" }
-firebase-messaging = { module = "com.google.firebase:firebase-messaging", version.ref = "firebaseMessaging" }
-glide = { module = "com.github.bumptech.glide:glide", version.ref = "compiler" }
-google-firebase-firestore = { module = "com.google.firebase:firebase-firestore" }
-google-firebase-storage = { module = "com.google.firebase:firebase-storage" }
-junit = { group = "junit", name = "junit", version.ref = "junit" }
-ext-junit = { group = "androidx.test.ext", name = "junit", version.ref = "junitVersion" }
-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
-material = { group = "com.google.android.material", name = "material", version.ref = "material" }
-activity = { group = "androidx.activity", name = "activity", version.ref = "activity" }
-constraintlayout = { group = "androidx.constraintlayout", name = "constraintlayout", version.ref = "constraintlayout" }
-firebase-auth = { group = "com.google.firebase", name = "firebase-auth", version.ref = "firebaseAuth" }
-credentials = { group = "androidx.credentials", name = "credentials", version.ref = "credentials" }
-credentials-play-services-auth = { group = "androidx.credentials", name = "credentials-play-services-auth", version.ref = "credentialsPlayServicesAuth" }
-googleid = { group = "com.google.android.libraries.identity.googleid", name = "googleid", version.ref = "googleid" }
-firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
-firebase-storage = { group = "com.google.firebase", name = "firebase-storage", version.ref = "firebaseStorage" }
-okhttp = { module = "com.squareup.okhttp3:okhttp", version.ref = "okhttp" }
-osmdroid-android = { module = "org.osmdroid:osmdroid-android", version.ref = "osmdroidAndroid" }
-recyclerview = { module = "androidx.recyclerview:recyclerview", version.ref = "recyclerview" }
-room-common-jvm = { group = "androidx.room", name = "room-common-jvm", version.ref = "roomCommonJvm" }
-firebase-database = { group = "com.google.firebase", name = "firebase-database", version.ref = "firebaseDatabase" }
-play-services-maps = { group = "com.google.android.gms", name = "play-services-maps", version.ref = "playServicesMaps" }
+
+# ── AndroidX ────────────────────────────────────────────────────────────
+appcompat                     = { group = "androidx.appcompat",         name = "appcompat",                          version.ref = "appcompat" }
+material                      = { group = "com.google.android.material", name = "material",                           version.ref = "material" }
+activity                      = { group = "androidx.activity",           name = "activity",                           version.ref = "activity" }
+constraintlayout              = { group = "androidx.constraintlayout",   name = "constraintlayout",                   version.ref = "constraintlayout" }
+recyclerview                  = { module = "androidx.recyclerview:recyclerview",                                       version.ref = "recyclerview" }
+credentials                   = { group = "androidx.credentials",        name = "credentials",                        version.ref = "credentials" }
+credentials-play-services-auth = { group = "androidx.credentials",       name = "credentials-play-services-auth",     version.ref = "credentialsPlayServicesAuth" }
+
+# ── Firebase (managed by BOM — no version on individual libs) ────────────
+firebase-bom                  = { module = "com.google.firebase:firebase-bom",       version.ref = "firebaseBom" }
+firebase-auth                 = { module = "com.google.firebase:firebase-auth" }
+firebase-firestore            = { module = "com.google.firebase:firebase-firestore" }
+firebase-storage              = { module = "com.google.firebase:firebase-storage" }
+firebase-database             = { module = "com.google.firebase:firebase-database" }
+firebase-messaging            = { module = "com.google.firebase:firebase-messaging",  version.ref = "firebaseMessaging" }
+
+# ── Google identity / Maps ───────────────────────────────────────────────
+googleid                      = { group = "com.google.android.libraries.identity.googleid", name = "googleid",        version.ref = "googleid" }
+play-services-maps            = { group = "com.google.android.gms",     name = "play-services-maps",                 version.ref = "playServicesMaps" }
+
+# ── Image loading ────────────────────────────────────────────────────────
+glide                         = { module = "com.github.bumptech.glide:glide",        version.ref = "glide" }
+glide-compiler                = { module = "com.github.bumptech.glide:compiler",     version.ref = "glide" }
+picasso                       = { module = "com.squareup.picasso:picasso",            version.ref = "picasso" }
+circleimageview               = { module = "de.hdodenhof:circleimageview",            version.ref = "circleimageview" }
+
+# ── Maps / Location ──────────────────────────────────────────────────────
+osmdroid-android              = { module = "org.osmdroid:osmdroid-android",           version.ref = "osmdroidAndroid" }
+
+# ── Networking ───────────────────────────────────────────────────────────
+okhttp                        = { module = "com.squareup.okhttp3:okhttp",             version.ref = "okhttp" }
+
+# ── Scalable size units ──────────────────────────────────────────────────
+sdp-android                   = { module = "com.intuit.sdp:sdp-android",             version.ref = "sdp" }
+ssp-android                   = { module = "com.intuit.ssp:ssp-android",             version.ref = "sdp" }
+
+# ── Testing ──────────────────────────────────────────────────────────────
+junit                         = { group = "junit",                       name = "junit",                              version.ref = "junit" }
+ext-junit                     = { group = "androidx.test.ext",           name = "junit",                              version.ref = "junitVersion" }
+espresso-core                 = { group = "androidx.test.espresso",      name = "espresso-core",                      version.ref = "espressoCore" }
+google-firebase-firestore = { group = "com.google.firebase", name = "firebase-firestore", version.ref = "firebaseFirestore" }
+
 
 [plugins]
-android-application = { id = "com.android.application", version.ref = "agp" }
-google-gms-google-services = { id = "com.google.gms.google-services", version.ref = "googleGmsGoogleServices" }
-
+android-application         = { id = "com.android.application",          version.ref = "agp" }
+google-gms-google-services  = { id = "com.google.gms.google-services",   version.ref = "googleGmsGoogleServices" }

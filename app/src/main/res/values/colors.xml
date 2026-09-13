@@ -1,26 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
+<!--
+    colors.xml — COMPLETE replacement for BookWormConnect
+    Place in: app/src/main/res/values/colors.xml
+    REPLACES the existing file (which only had black and white)
+-->
 <resources>
+
+    <!-- ── Base ───────────────────────────────────────────────────────── -->
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
-    <!-- ── Existing app colours (keep yours if different) ──────────── -->
-    <color name="primary">#6D4C41</color>          <!-- warm brown -->
-    <color name="primaryDark">#4E342E</color>
-    <color name="accent">#FF8F00</color>            <!-- amber -->
 
-    <!-- ── Chat screen colours ──────────────────────────────────────── -->
-    <color name="chatBackground">#FFF8F5</color>   <!-- warm off-white -->
+    <!-- ── App brand colours (warm brown) ────────────────────────────── -->
+    <color name="primary">#6D4C41</color>
+    <color name="primaryDark">#4E342E</color>
+    <color name="primaryLight">#A1887F</color>
+    <color name="accent">#FF8F00</color>
+
+    <!-- ── Chat screen ────────────────────────────────────────────────── -->
+    <color name="chatBackground">#FFF8F5</color>
     <color name="inputBackground">#FFFFFF</color>
 
-    <!-- ── Chip colours ─────────────────────────────────────────────── -->
-    <!-- Question chips (sender) -->
-    <color name="chipBackground">#E8D5CC</color>   <!-- light brown-rose -->
-    <!-- Answer chips (receiver) -->
-    <color name="chipAnswerBackground">#C8E6C9</color> <!-- light green -->
-    <!-- Chip text -->
-    <color name="chipText">#3E2723</color>         <!-- dark brown -->
+    <!-- ── Chip colours ───────────────────────────────────────────────── -->
+    <color name="chipBackground">#E8D5CC</color>
+    <color name="chipAnswerBackground">#C8E6C9</color>
+    <color name="chipText">#3E2723</color>
 
-    <!-- ── Message text ─────────────────────────────────────────────── -->
+    <!-- ── Text ───────────────────────────────────────────────────────── -->
     <color name="textPrimary">#212121</color>
     <color name="textSecondary">#757575</color>
+    <color name="textHint">#BDBDBD</color>
+
+    <!-- ── General UI ─────────────────────────────────────────────────── -->
+    <color name="divider">#E0E0E0</color>
+    <color name="cardBackground">#FFFFFF</color>
+    <color name="backgroundLight">#FAFAFA</color>
 
 </resources>

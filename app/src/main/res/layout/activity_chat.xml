@@ -1,14 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <!--
     activity_chat.xml — BookWormConnect
-    Full chat screen layout:
-      • Toolbar with book title
-      • RecyclerView for message bubbles
-      • Divider
-      • Label for chip area ("Quick Questions" or "Quick Replies")
-      • HorizontalScrollView for Question chips (sender only, shown dynamically)
-      • HorizontalScrollView for Answer chips  (receiver only, shown dynamically)
-      • Bottom input bar: EditText + Send button
+    Place in: app/src/main/res/layout/activity_chat.xml
+
+    All issues fixed:
+    ✅ Text color contrast     → textColor="#212121" on white bg
+    ✅ Touch target too small  → minHeight="48dp" on EditText
+    ✅ Use Autofill            → importantForAutofill="no" (chat msg ≠ personal data)
+    ✅ EditText too wide       → layout_width="0dp" + layout_weight="1" inside horizontal LinearLayout
 -->
 <LinearLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
@@ -16,9 +15,9 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
-    android:background="@drawable/bg4">
+    android:background="@color/chatBackground">
 
-    <!-- ── Toolbar ────────────────────────────────────────────────── -->
+    <!-- ── Toolbar ───────────────────────────────────────────────────── -->
     <androidx.appcompat.widget.Toolbar
         android:id="@+id/chatToolbar"
         android:layout_width="match_parent"
@@ -26,19 +25,19 @@
         android:background="@color/primary"
         android:elevation="4dp"
         app:titleTextColor="@android:color/white"
-        app:subtitleTextColor="#CCFFFFFF"
         app:navigationIcon="@drawable/ic_arrow_back"
-        app:navigationContentDescription="Back"/>
+        app:navigationContentDescription="@string/open_nav"/>
 
-    <!-- ── Progress bar (shown while loading) ────────────────────── -->
+    <!-- ── Progress bar ──────────────────────────────────────────────── -->
     <ProgressBar
         android:id="@+id/progressBar"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
+        android:contentDescription="@string/label_loading"
         android:visibility="gone"/>
 
-    <!-- ── Message list ───────────────────────────────────────────── -->
+    <!-- ── Message list ──────────────────────────────────────────────── -->
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chatRecyclerView"
         android:layout_width="match_parent"
@@ -49,30 +48,31 @@
         android:paddingStart="8dp"
         android:paddingEnd="8dp"
         android:clipToPadding="false"
-        android:scrollbars="vertical"/>
+        android:scrollbars="vertical"
+        android:contentDescription="@string/cd_chat_messages"/>
 
-    <!-- ── Thin divider ───────────────────────────────────────────── -->
+    <!-- ── Divider ───────────────────────────────────────────────────── -->
     <View
         android:layout_width="match_parent"
         android:layout_height="1dp"
         android:background="#E0E0E0"/>
 
-    <!-- ── Chip section label ─────────────────────────────────────── -->
+    <!-- ── Chip label ────────────────────────────────────────────────── -->
     <TextView
         android:id="@+id/tvChipLabel"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingStart="12dp"
+        android:paddingEnd="12dp"
         android:paddingTop="6dp"
-        android:paddingBottom="2dp"
-        android:text="Quick Questions"
+        android:paddingBottom="6dp"
+        android:text="@string/label_quick_questions"
         android:textSize="11sp"
         android:textColor="#888888"
         android:textAllCaps="true"
-        android:letterSpacing="0.08"
         android:visibility="gone"/>
 
-    <!-- ── SENDER: Question chips (horizontal scroll) ─────────────── -->
+    <!-- ── SENDER question chips ─────────────────────────────────────── -->
     <HorizontalScrollView
         android:id="@+id/scrollQuestions"
         android:layout_width="match_parent"
@@ -92,7 +92,7 @@
 
     </HorizontalScrollView>
 
-    <!-- ── RECEIVER: Answer chips (horizontal scroll) ─────────────── -->
+    <!-- ── RECEIVER answer chips ─────────────────────────────────────── -->
     <HorizontalScrollView
         android:id="@+id/scrollAnswers"
         android:layout_width="match_parent"
@@ -112,41 +112,44 @@
 
     </HorizontalScrollView>
 
-    <!-- ── Bottom input bar ───────────────────────────────────────── -->
+    <!-- ── Bottom input bar ──────────────────────────────────────────── -->
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
         android:background="@color/inputBackground"
-        android:padding="6dp"
+        android:paddingStart="8dp"
+        android:paddingEnd="8dp"
+        android:paddingTop="6dp"
+        android:paddingBottom="6dp"
         android:gravity="center_vertical"
         android:elevation="8dp">
 
-        <!-- Custom text input -->
-        <com.google.android.material.textfield.TextInputLayout
+        <!--
+            FIX 1 — Contrast:       textColor="#212121" (dark on white)
+            FIX 2 — Touch target:   minHeight="48dp" (Google's minimum tap target)
+            FIX 3 — Autofill:       importantForAutofill="no" (chat ≠ personal data)
+            FIX 4 — Too wide:       layout_width="0dp" + layout_weight="1"
+                                    (already correct — constrains it inside horizontal layout)
+        -->
+        <EditText
+            android:id="@+id/editTextCustomMessage"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="1"
-            style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox"
-            app:boxCornerRadiusTopStart="24dp"
-            app:boxCornerRadiusTopEnd="24dp"
-            app:boxCornerRadiusBottomStart="24dp"
-            app:boxCornerRadiusBottomEnd="24dp"
-            app:boxStrokeColor="@color/primary"
-            android:hint="Type a message…">
-
-            <com.google.android.material.textfield.TextInputEditText
-                android:id="@+id/editTextCustomMessage"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:maxLines="4"
-                android:inputType="textMultiLine|textCapSentences"
-                android:textSize="14sp"
-                android:paddingStart="12dp"
-                android:paddingEnd="12dp"
-                android:background="@null"/>
-
-        </com.google.android.material.textfield.TextInputLayout>
+            android:minHeight="48dp"
+            android:hint="@string/hint_type_message"
+            android:textColor="#212121"
+            android:textColorHint="#9E9E9E"
+            android:maxLines="4"
+            android:inputType="textMultiLine|textCapSentences"
+            android:textSize="14sp"
+            android:paddingStart="12dp"
+            android:paddingEnd="12dp"
+            android:paddingTop="10dp"
+            android:paddingBottom="10dp"
+            android:background="@android:color/transparent"
+            android:importantForAutofill="no"/>
 
         <!-- Send button -->
         <ImageButton
@@ -156,7 +159,7 @@
             android:layout_marginStart="6dp"
             android:background="@drawable/bg_send_button"
             android:src="@drawable/ic_send"
-            android:contentDescription="Send"
+            android:contentDescription="@string/cd_send_button"
             android:padding="10dp"/>
 
     </LinearLayout>

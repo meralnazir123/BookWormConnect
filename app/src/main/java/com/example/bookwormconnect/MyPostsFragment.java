@@ -1,45 +1,58 @@
 package com.example.bookwormconnect;
 
 import android.os.Bundle;
-
-import androidx.fragment.app.Fragment;
-import androidx.recyclerview.widget.RecyclerView;
-
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
-import com.google.firebase.database.DatabaseReference;
+import androidx.fragment.app.Fragment;
+import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.firestore.FirebaseFirestore;
 
 import java.util.ArrayList;
 
 public class MyPostsFragment extends Fragment {
 
     RecyclerView recyclerView;
+    View emptyText;
     ArrayList<postmodel> list;
     postAdapter adapter;
-
-    DatabaseReference reference;
 
     public MyPostsFragment() {
     }
 
-
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(
+            LayoutInflater inflater,
+            ViewGroup container,
+            Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_my_posts, container, false);
+        View view = inflater.inflate(
+                R.layout.fragment_my_posts,
+                container,
+                false
+        );
 
-        recyclerView = view.findViewById(R.id.recyclerView);
+        recyclerView =
+                view.findViewById(R.id.recyclerView);
+
+        emptyText =
+                view.findViewById(R.id.emptyText);
 
         recyclerView.setLayoutManager(
-                new androidx.recyclerview.widget.LinearLayoutManager(getContext())
+                new androidx.recyclerview.widget.LinearLayoutManager(
+                        getContext()
+                )
         );
 
         list = new ArrayList<>();
 
-        adapter = new postAdapter(list, "MY_POSTS");
+        adapter = new postAdapter(
+                list,
+                "MY_POSTS"
+        );
 
         recyclerView.setAdapter(adapter);
 
@@ -47,14 +60,19 @@ public class MyPostsFragment extends Fragment {
 
         return view;
     }
+
     private void loadMyPosts() {
 
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            return;
+        }
+
         String currentUserId =
-                com.google.firebase.auth.FirebaseAuth.getInstance()
+                FirebaseAuth.getInstance()
                         .getCurrentUser()
                         .getUid();
 
-        com.google.firebase.firestore.FirebaseFirestore.getInstance()
+        FirebaseFirestore.getInstance()
                 .collection("posts")
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
@@ -64,9 +82,10 @@ public class MyPostsFragment extends Fragment {
                     for (com.google.firebase.firestore.QueryDocumentSnapshot doc
                             : queryDocumentSnapshots) {
 
-                        postmodel post = doc.toObject(postmodel.class);
+                        postmodel post =
+                                doc.toObject(postmodel.class);
 
-                        if(post.userId != null &&
+                        if (post.userId != null &&
                                 post.userId.equals(currentUserId)) {
 
                             post.docId = doc.getId();
@@ -76,6 +95,25 @@ public class MyPostsFragment extends Fragment {
                     }
 
                     adapter.notifyDataSetChanged();
+
+                    updateEmptyState();
+
                 });
+    }
+
+    private void updateEmptyState() {
+
+        if (list.isEmpty()) {
+
+            recyclerView.setVisibility(View.GONE);
+            emptyText.setVisibility(View.VISIBLE);
+            ((android.widget.TextView) emptyText)
+                    .setText("You haven't posted any books yet");
+
+        } else {
+
+            recyclerView.setVisibility(View.VISIBLE);
+            emptyText.setVisibility(View.GONE);
+        }
     }
 }

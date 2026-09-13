@@ -87,7 +87,7 @@ public class DepositActivity extends AppCompatActivity {
                         return;
                     }
 
-                    bookId = requestDocument.getString("bookId");
+                    bookId = requestDocument.getString("postId");
 
                     if (bookId == null) {
                         Toast.makeText(this,

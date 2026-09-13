@@ -32,7 +32,7 @@
             android:background="@android:color/transparent"
             android:contentDescription="Delete"
             android:src="@drawable/bin"
-            app:tint="#fff3c2"
+            app:tint="#E57373"
             tools:ignore="TouchTargetSizeCheck">
         </ImageButton>
     </LinearLayout>
@@ -41,13 +41,14 @@
         android:id="@+id/postImage"
         android:layout_width="match_parent"
         android:layout_height="414dp"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="10dp"
         android:adjustViewBounds="true"
         android:scaleType="centerCrop" />
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
+
         android:gravity="center_vertical">
 
         <LinearLayout
@@ -93,20 +94,14 @@
                 android:layout_height="wrap_content"/>
 
             <TextView
-                android:id="@+id/returnDateTv"
+                android:id="@+id/txtStatus"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="Return Date"
+                android:text="Status: Available"
                 android:textSize="17sp"
-                android:textStyle="bold"/>
-
-            <TextView
-                android:id="@+id/statusTv"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="Status"
-                android:textSize="17sp"
-                android:textStyle="bold"/>
+                android:textColor="#81C784"
+                android:textStyle="bold"
+                android:layout_marginTop="4dp"/>
         </LinearLayout>
 
         <ImageButton

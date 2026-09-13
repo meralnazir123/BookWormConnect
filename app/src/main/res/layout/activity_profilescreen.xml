@@ -10,6 +10,7 @@
     tools:context=".profilescreen">
 
     <LinearLayout
+        android:layout_marginTop="10dp"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
@@ -111,6 +112,16 @@
 
         </LinearLayout>
     </LinearLayout>
+
+    <TextView
+        android:id="@+id/noPostsText"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="No posts uploaded"
+        android:textSize="16sp"
+        android:gravity="center"
+        android:visibility="gone"
+        android:padding="20dp" />
 
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/PostsRecycler"

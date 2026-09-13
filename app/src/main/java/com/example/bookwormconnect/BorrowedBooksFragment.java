@@ -1,41 +1,64 @@
 package com.example.bookwormconnect;
+
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Toast;
+
 import androidx.fragment.app.Fragment;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.firestore.FirebaseFirestore;
+
 import java.util.ArrayList;
+
 public class BorrowedBooksFragment extends Fragment {
 
     RecyclerView recyclerView;
+    View emptyText;
     ArrayList<postmodel> list;
     postAdapter adapter;
+
+    FirebaseFirestore db;
 
     public BorrowedBooksFragment() {
     }
 
     @Override
-    public View onCreateView(LayoutInflater inflater, ViewGroup container,
-                             Bundle savedInstanceState) {
+    public View onCreateView(
+            LayoutInflater inflater,
+            ViewGroup container,
+            Bundle savedInstanceState) {
 
-        View view = inflater.inflate(R.layout.fragment_my_posts,
-                container, false);
+        View view = inflater.inflate(
+                R.layout.fragment_my_posts,
+                container,
+                false
+        );
 
-        recyclerView = view.findViewById(R.id.recyclerView);
+        recyclerView =
+                view.findViewById(R.id.recyclerView);
+
+        emptyText =
+                view.findViewById(R.id.emptyText);
 
         recyclerView.setLayoutManager(
-                new LinearLayoutManager(getContext())
+                new LinearLayoutManager(requireContext())
         );
 
         list = new ArrayList<>();
 
-        adapter = new postAdapter(list, "BORROWED");
+        adapter = new postAdapter(
+                list,
+                "BORROWED"
+        );
 
         recyclerView.setAdapter(adapter);
+
+        db = FirebaseFirestore.getInstance();
 
         loadBorrowedBooks();
 
@@ -44,33 +67,93 @@ public class BorrowedBooksFragment extends Fragment {
 
     private void loadBorrowedBooks() {
 
+        if (FirebaseAuth.getInstance().getCurrentUser() == null) {
+            return;
+        }
+
         String currentUserId =
                 FirebaseAuth.getInstance()
                         .getCurrentUser()
                         .getUid();
 
-        FirebaseFirestore.getInstance()
-                .collection("posts")
+        db.collection("borrowedBooks")
+                .whereEqualTo(
+                        "borrowerId",
+                        currentUserId
+                )
                 .get()
                 .addOnSuccessListener(queryDocumentSnapshots -> {
 
                     list.clear();
 
-                    for(var doc : queryDocumentSnapshots){
+                    for (var doc : queryDocumentSnapshots) {
 
                         postmodel post =
-                                doc.toObject(postmodel.class);
+                                new postmodel();
 
-                        if(post.borrowerId != null &&
-                                post.borrowerId.equals(currentUserId)){
+                        post.docId =
+                                doc.getId();
 
-                            post.docId = doc.getId();
+                        post.userId =
+                                doc.getString("ownerId");
 
-                            list.add(post);
-                        }
+                        post.borrowerId =
+                                doc.getString("borrowerId");
+
+                        post.url =
+                                doc.getString("url");
+
+                        post.username =
+                                doc.getString("username");
+
+                        post.description =
+                                doc.getString("description");
+
+                        post.duration =
+                                doc.getString("duration");
+
+                        post.deposit =
+                                doc.getString("deposit");
+
+                        post.status =
+                                doc.getString("status");
+
+
+                        post.bookType =
+                                doc.getString("bookType");
+
+                        list.add(post);
                     }
 
                     adapter.notifyDataSetChanged();
+
+                    updateEmptyState();
+
+                })
+                .addOnFailureListener(e -> {
+
+                    Toast.makeText(
+                            requireContext(),
+                            "Failed to load borrowed books: "
+                                    + e.getMessage(),
+                            Toast.LENGTH_LONG
+                    ).show();
                 });
+    }
+
+    private void updateEmptyState() {
+
+        if (list.isEmpty()) {
+
+            recyclerView.setVisibility(View.GONE);
+            emptyText.setVisibility(View.VISIBLE);
+            ((android.widget.TextView) emptyText)
+                    .setText("You haven't borrowed any books yet");
+
+        } else {
+
+            recyclerView.setVisibility(View.VISIBLE);
+            emptyText.setVisibility(View.GONE);
+        }
     }
 }

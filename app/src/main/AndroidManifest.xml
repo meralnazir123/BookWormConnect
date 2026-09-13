@@ -29,6 +29,9 @@
         <activity
             android:name=".DepositActivity"
             android:exported="false" />
+        <activity
+            android:name=".AboutActivity"
+            android:exported="false" />
 
         <service
             android:name=".MyFMService"
@@ -56,9 +59,6 @@
             android:exported="false" />
         <activity
             android:name=".EditProfileActivity"
-            android:exported="false" />
-        <activity
-            android:name=".mapPicker"
             android:exported="false" />
         <activity
             android:name=".PostDetailActivity"

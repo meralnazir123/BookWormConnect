@@ -4,6 +4,9 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.view.MotionEvent;
+import android.text.method.HideReturnsTransformationMethod;
+import android.text.method.PasswordTransformationMethod;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
@@ -15,7 +18,8 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
-import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 
 public class LoginActivity extends AppCompatActivity {
@@ -23,180 +27,366 @@ public class LoginActivity extends AppCompatActivity {
     TextView registerTV, forgetPW;
     EditText UN, PW;
     Button button;
+
     FirebaseAuth mAuth;
- FirebaseFirestore firestore;
+    DatabaseReference usernameReference;
+
     private SharedPreferences sharedPreferences;
     CheckBox checkBox;
+
     private static final String PREFS_NAME = "LoginPrefs";
     private static final String PREF_USERNAME = "username";
     private static final String PREF_REMEMBER_ME = "rememberMe";
 
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
         EdgeToEdge.enable(this);
         setContentView(R.layout.activity_login);
 
-        sharedPreferences = getSharedPreferences(PREFS_NAME, Context.MODE_PRIVATE);
+        sharedPreferences = getSharedPreferences(
+                PREFS_NAME,
+                Context.MODE_PRIVATE
+        );
+
         mAuth = FirebaseAuth.getInstance();
-        firestore = FirebaseFirestore.getInstance();
 
-        FirebaseUser currentUser = FirebaseAuth.getInstance().getCurrentUser();
-        boolean rememberMe = sharedPreferences.getBoolean(PREF_REMEMBER_ME, false);
 
-        if (currentUser != null &&
-                currentUser.isEmailVerified() &&
-                rememberMe) {
 
-            startActivity(new Intent(LoginActivity.this,
-                    HomeActivity.class));
+        usernameReference = FirebaseDatabase.getInstance()
+                .getReference("usernames");
 
-            finish();
-
-            return;
-        }
-        checkBox=findViewById(R.id.checkBox);
+        checkBox = findViewById(R.id.checkBox);
         UN = findViewById(R.id.Un);
         PW = findViewById(R.id.pwd);
 
+        button = findViewById(R.id.button);
+        registerTV = findViewById(R.id.RegisterTV);
+        forgetPW = findViewById(R.id.forgetPW);
+        FirebaseUser currentUser =
+                mAuth.getCurrentUser();
+
+        boolean savedRememberMe =
+                sharedPreferences.getBoolean(
+                        PREF_REMEMBER_ME,
+                        false
+                );
+
+        if (currentUser != null &&
+                currentUser.isEmailVerified() &&
+                savedRememberMe) {
+
+            startActivity(new Intent(
+                    LoginActivity.this,
+                    HomeActivity.class
+            ));
+
+            finish();
+            return;
+        }
+
         PW.setOnTouchListener((v, event) -> {
-            if (event.getAction() == android.view.MotionEvent.ACTION_UP) {
+
+            if (event.getAction() ==
+                    MotionEvent.ACTION_UP) {
+
                 if (event.getRawX() >=
-                        (PW.getRight()- PW.getCompoundDrawables()[2].getBounds().width())) {
+                        (PW.getRight()
+                                - PW.getCompoundDrawables()[2]
+                                .getBounds()
+                                .width())) {
+
                     if (PW.getTransformationMethod()
-                            instanceof android.text.method.PasswordTransformationMethod) {
+                            instanceof PasswordTransformationMethod) {
+
+                        // Show password
 
                         PW.setTransformationMethod(
-                                android.text.method.HideReturnsTransformationMethod.getInstance());
+                                HideReturnsTransformationMethod
+                                        .getInstance()
+                        );
 
                         PW.setCompoundDrawablesWithIntrinsicBounds(
-                                0, 0, R.drawable.visibility_24dp_e3e3e3, 0);
+                                0,
+                                0,
+                                R.drawable.visibility_24dp_e3e3e3,
+                                0
+                        );
 
                     } else {
 
+                        // Hide password
+
                         PW.setTransformationMethod(
-                                android.text.method.PasswordTransformationMethod.getInstance());
+                                PasswordTransformationMethod
+                                        .getInstance()
+                        );
 
                         PW.setCompoundDrawablesWithIntrinsicBounds(
-                                0, 0, R.drawable.visibility_off_24dp_e3e3e3, 0);
+                                0,
+                                0,
+                                R.drawable.visibility_off_24dp_e3e3e3,
+                                0
+                        );
                     }
 
-                    PW.setSelection(PW.getText().length());
+                    PW.setSelection(
+                            PW.getText().length()
+                    );
+
                     return true;
                 }
             }
+
             return false;
         });
 
-        button = findViewById(R.id.button);
-        registerTV = findViewById(R.id.RegisterTV);
-        forgetPW=findViewById(R.id.forgetPW);
-
-        forgetPW.setOnClickListener(v -> startActivity(new Intent(LoginActivity.this,
-                forgetPW.class)));
 
         loadLoginPreferences();
+
+
+        forgetPW.setOnClickListener(v ->
+                startActivity(new Intent(
+                        LoginActivity.this,
+                        forgetPW.class
+                ))
+        );
         registerTV.setOnClickListener(v -> {
-            Intent intent = new Intent(LoginActivity.this, RegisterActivity.class);
+
+            Intent intent = new Intent(
+                    LoginActivity.this,
+                    RegisterActivity.class
+            );
+
             startActivity(intent);
             finish();
         });
 
         button.setOnClickListener(v -> {
-            String username = UN.getText().toString().trim();
-            String password = PW.getText().toString().trim();
-            if (username.isEmpty() || password.isEmpty()) {
-                Toast.makeText(LoginActivity.this, "All fields required!", Toast.LENGTH_SHORT).show();
+
+            String usernameOrEmail =
+                    UN.getText()
+                            .toString()
+                            .trim();
+
+            String password =
+                    PW.getText()
+                            .toString()
+                            .trim();
+
+            if (usernameOrEmail.isEmpty() ||
+                    password.isEmpty()) {
+
+                Toast.makeText(
+                        LoginActivity.this,
+                        "All fields required!",
+                        Toast.LENGTH_SHORT
+                ).show();
+
                 return;
             }
-            boolean rememberMe1 =checkBox.isChecked();
 
-            SharedPreferences.Editor editor=sharedPreferences.edit();
-            if (rememberMe1) {
-                editor.putString(PREF_USERNAME, username);
-                editor.putBoolean(PREF_REMEMBER_ME, true);
-            } else {
-                editor.remove(PREF_USERNAME);
-                editor.putBoolean(PREF_REMEMBER_ME, false);
+
+            boolean rememberMe =
+                    checkBox.isChecked();
+
+
+            if (android.util.Patterns.EMAIL_ADDRESS
+                    .matcher(usernameOrEmail)
+                    .matches()) {
+
+                loginWithEmail(
+                        usernameOrEmail,
+                        password,
+                        rememberMe
+                );
+
             }
-            editor.apply();
-            firestore.collection("users")
-                    .whereEqualTo("username", username)
-                    .get()
-                    .addOnSuccessListener(queryDocumentSnapshots -> {
 
-                        if (!queryDocumentSnapshots.isEmpty()) {
 
-                            String email = queryDocumentSnapshots
-                                    .getDocuments()
-                                    .get(0)
-                                    .getString("email");
+            else {
 
-                            if (email != null) {
-
-                                mAuth.signInWithEmailAndPassword(email, password)
-                                        .addOnCompleteListener(task -> {
-
-                                            if (task.isSuccessful()) {
-
-                                                FirebaseUser user =
-                                                        FirebaseAuth.getInstance().getCurrentUser();
-
-                                                if (user != null) {
-
-                                                    user.reload().addOnCompleteListener(reloadTask -> {
-
-                                                        if (user.isEmailVerified()) {
-
-                                                            Toast.makeText(LoginActivity.this,
-                                                                    "Login Successful",
-                                                                    Toast.LENGTH_SHORT).show();
-
-                                                            startActivity(new Intent(LoginActivity.this,
-                                                                    HomeActivity.class));
-                                                            finish();
-
-                                                        } else {
-
-                                                            Toast.makeText(LoginActivity.this,
-                                                                    "Please verify your email first",
-                                                                    Toast.LENGTH_LONG).show();
-
-                                                            FirebaseAuth.getInstance().signOut();
-                                                        }
-                                                    });
-                                                }
-                                            } else {
-
-                                                Toast.makeText(LoginActivity.this,
-                                                        "Invalid credentials",
-                                                        Toast.LENGTH_SHORT).show();
-                                            }
-                                        });
-                            }
-
-                        } else {
-
-                            Toast.makeText(LoginActivity.this,
-                                    "Username not found",
-                                    Toast.LENGTH_SHORT).show();
-                        }
-
-                    })
-                    .addOnFailureListener(e ->
-
-                            Toast.makeText(LoginActivity.this,
-                                    "Database error: " + e.getMessage(),
-                                    Toast.LENGTH_SHORT).show()
-                    );
+                loginWithUsername(
+                        usernameOrEmail,
+                        password,
+                        rememberMe
+                );
+            }
         });
     }
 
-    private void loadLoginPreferences() {
-        String savedUsername = sharedPreferences.getString(PREF_USERNAME, "");
-        boolean rememberMeChecked = sharedPreferences.getBoolean(PREF_REMEMBER_ME, false);
 
-        UN.setText(savedUsername);
-        checkBox.setChecked(rememberMeChecked);
+    private void loginWithEmail(
+            String email,
+            String password,
+            boolean rememberMe
+    ) {
+
+        mAuth.signInWithEmailAndPassword(
+                        email,
+                        password
+                )
+                .addOnCompleteListener(task -> {
+
+                    if (task.isSuccessful()) {
+
+                        checkEmailVerification(
+                                rememberMe
+                        );
+
+                    } else {
+
+                        Toast.makeText(
+                                LoginActivity.this,
+                                "Invalid email or password",
+                                Toast.LENGTH_SHORT
+                        ).show();
+                    }
+                });
+    }
+
+    private void loginWithUsername(
+            String username,
+            String password,
+            boolean rememberMe
+    ) {
+        String normalizedUsername =
+                username
+                        .trim()
+                        .toLowerCase();
+        usernameReference
+                .child(normalizedUsername)
+                .get()
+                .addOnSuccessListener(snapshot -> {
+
+                    if (!snapshot.exists()) {
+
+                        Toast.makeText(
+                                LoginActivity.this,
+                                "Username not found",
+                                Toast.LENGTH_SHORT
+                        ).show();
+
+                        return;
+                    }
+
+                    String email =
+                            snapshot.child("email")
+                                    .getValue(String.class);
+
+                    if (email == null ||
+                            email.isEmpty()) {
+
+                        Toast.makeText(
+                                LoginActivity.this,
+                                "Email not found for this username",
+                                Toast.LENGTH_SHORT
+                        ).show();
+
+                        return;
+                    }
+
+
+                    loginWithEmail(
+                            email,
+                            password,
+                            rememberMe
+                    );
+                })
+                .addOnFailureListener(e -> {
+
+                    Toast.makeText(
+                            LoginActivity.this,
+                            "Username lookup failed: "
+                                    + e.getMessage(),
+                            Toast.LENGTH_LONG
+                    ).show();
+                });
+    }
+
+
+    private void loadLoginPreferences() {
+
+        String savedUsername =
+                sharedPreferences.getString(
+                        PREF_USERNAME,
+                        ""
+                );
+
+
+        boolean rememberMeChecked =
+                sharedPreferences.getBoolean(
+                        PREF_REMEMBER_ME,
+                        false
+                );
+
+              UN.setText(savedUsername);
+        checkBox.setChecked(
+                rememberMeChecked
+        );
+    }
+    private void checkEmailVerification(
+            boolean rememberMe
+    ) {
+        FirebaseUser user =
+                mAuth.getCurrentUser();
+        if (user == null) {
+            return;
+        }
+        user.reload()
+                .addOnCompleteListener(reloadTask -> {
+
+                    FirebaseUser updatedUser =
+                            mAuth.getCurrentUser();
+                    if (updatedUser != null &&
+                            updatedUser.isEmailVerified()) {
+                        SharedPreferences.Editor editor =
+                                sharedPreferences.edit();
+                        if (rememberMe) {
+                            editor.putString(
+                                    PREF_USERNAME,
+                                    UN.getText()
+                                            .toString()
+                                            .trim()
+                            );
+
+                            editor.putBoolean(
+                                    PREF_REMEMBER_ME,
+                                    true
+                            );
+
+                        } else {
+                            editor.remove(
+                                    PREF_USERNAME
+                            );
+
+                            editor.putBoolean(
+                                    PREF_REMEMBER_ME,
+                                    false
+                            );
+                        }
+                        editor.apply();
+                        Toast.makeText(
+                                LoginActivity.this,
+                                "Login Successful",
+                                Toast.LENGTH_SHORT
+                        ).show();
+                        startActivity(new Intent(
+                                LoginActivity.this,
+                                HomeActivity.class
+                        ));
+                        finish();
+                    }
+                    else {
+                        Toast.makeText(
+                                LoginActivity.this,
+                                "Please verify your email first",
+                                Toast.LENGTH_LONG
+                        ).show();
+                        mAuth.signOut();
+                    }
+                });
     }
 }

@@ -17,9 +17,6 @@ public class MyBooksPagerAdapter extends FragmentStateAdapter {
 
         switch (position) {
 
-            case 0:
-                return new MyPostsFragment();
-
             case 1:
                 return new BorrowedBooksFragment();
 

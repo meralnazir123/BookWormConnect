@@ -13,7 +13,9 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.firebase.firestore.FirebaseFirestore;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class AdminDepositAdapter
         extends RecyclerView.Adapter<AdminDepositAdapter.DepositViewHolder> {
@@ -22,7 +24,9 @@ public class AdminDepositAdapter
     private List<AdminDeposit> depositList;
     private FirebaseFirestore db;
 
-    public AdminDepositAdapter(Context context, List<AdminDeposit> depositList) {
+    public AdminDepositAdapter(Context context,
+                               List<AdminDeposit> depositList) {
+
         this.context = context;
         this.depositList = depositList;
         db = FirebaseFirestore.getInstance();
@@ -62,8 +66,6 @@ public class AdminDepositAdapter
         holder.borrowerTv.setText(
                 "Borrower ID: " + deposit.getBorrowerId()
         );
-
-        // Show buttons only when payment is pending
         if ("pending".equals(deposit.getStatus())) {
 
             holder.approveBtn.setVisibility(View.VISIBLE);
@@ -74,41 +76,93 @@ public class AdminDepositAdapter
             holder.approveBtn.setVisibility(View.GONE);
             holder.rejectBtn.setVisibility(View.GONE);
         }
-
-        // APPROVE
         holder.approveBtn.setOnClickListener(v -> {
+
+            String requestId = deposit.getRequestId();
+            String bookId = deposit.getBookId();
+
+            if (requestId == null || requestId.isEmpty()) {
+
+                Toast.makeText(
+                        context,
+                        "Request ID is missing",
+                        Toast.LENGTH_LONG
+                ).show();
+
+                return;
+            }
+
+            if (bookId == null || bookId.isEmpty()) {
+
+                Toast.makeText(
+                        context,
+                        "Book ID is missing",
+                        Toast.LENGTH_LONG
+                ).show();
+
+                return;
+            }
 
             db.collection("deposits")
                     .document(deposit.getDepositId())
                     .update("status", "approved")
+
                     .addOnSuccessListener(unused -> {
+                        Map<String, Object> updates = new HashMap<>();
 
-                        Toast.makeText(
-                                context,
-                                "Deposit approved",
-                                Toast.LENGTH_SHORT
-                        ).show();
+                        updates.put("status", "Borrowed");
+                        updates.put("borrowerId", deposit.getBorrowerId());
 
-                        deposit.setStatus("approved");
+                        db.collection("posts")
+                                .document(bookId)
+                                .update(updates)
 
-                        notifyItemChanged(position);
+                                .addOnSuccessListener(aVoid -> {
+
+                                    deposit.setStatus("approved");
+
+                                    notifyItemChanged(position);
+
+
+                                    Toast.makeText(
+                                            context,
+                                            "Deposit approved. Book is now Borrowed.",
+                                            Toast.LENGTH_LONG
+                                    ).show();
+
+                                })
+
+                                .addOnFailureListener(e -> {
+
+                                    Toast.makeText(
+                                            context,
+                                            "Deposit approved but book status failed: "
+                                                    + e.getMessage(),
+                                            Toast.LENGTH_LONG
+                                    ).show();
+
+                                });
+
                     })
+
                     .addOnFailureListener(e -> {
 
                         Toast.makeText(
                                 context,
-                                "Failed: " + e.getMessage(),
+                                "Failed to approve deposit: "
+                                        + e.getMessage(),
                                 Toast.LENGTH_LONG
                         ).show();
+
                     });
         });
 
-        // REJECT
         holder.rejectBtn.setOnClickListener(v -> {
 
             db.collection("deposits")
                     .document(deposit.getDepositId())
                     .update("status", "rejected")
+
                     .addOnSuccessListener(unused -> {
 
                         Toast.makeText(
@@ -121,6 +175,7 @@ public class AdminDepositAdapter
 
                         notifyItemChanged(position);
                     })
+
                     .addOnFailureListener(e -> {
 
                         Toast.makeText(
@@ -132,16 +187,17 @@ public class AdminDepositAdapter
         });
     }
 
+
     @Override
     public int getItemCount() {
         return depositList.size();
     }
 
+
     public static class DepositViewHolder
             extends RecyclerView.ViewHolder {
 
         TextView amountTv;
-        TextView methodTv;
         TextView referenceTv;
         TextView statusTv;
         TextView borrowerTv;
@@ -152,12 +208,23 @@ public class AdminDepositAdapter
         public DepositViewHolder(@NonNull View itemView) {
             super(itemView);
 
-            amountTv = itemView.findViewById(R.id.amountTv);
-            referenceTv = itemView.findViewById(R.id.referenceTv);
-            statusTv = itemView.findViewById(R.id.statusTv);
-            borrowerTv = itemView.findViewById(R.id.borrowerTv);
-            approveBtn = itemView.findViewById(R.id.approveBtn);
-            rejectBtn = itemView.findViewById(R.id.rejectBtn);
+            amountTv =
+                    itemView.findViewById(R.id.amountTv);
+
+            referenceTv =
+                    itemView.findViewById(R.id.referenceTv);
+
+            statusTv =
+                    itemView.findViewById(R.id.statusTv);
+
+            borrowerTv =
+                    itemView.findViewById(R.id.borrowerTv);
+
+            approveBtn =
+                    itemView.findViewById(R.id.approveBtn);
+
+            rejectBtn =
+                    itemView.findViewById(R.id.rejectBtn);
         }
     }
 }

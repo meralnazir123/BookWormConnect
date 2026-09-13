@@ -9,10 +9,10 @@ public class request {
     public String receiverId;
     public String address;
     public String status;
+    public String requestedPickupDate;
+    public String requestedPickupTime;
     public boolean chatEnabled;
     public String chatId;
-
-    // NEW
     public String postId;
 
     public request() {

@@ -20,8 +20,8 @@ public String docId;
     public String duration;
     public String deposit;
     public String borrowerId;
+
     public String status;
-    public String returnDate;
 
     public postmodel() {}
 
@@ -41,14 +41,7 @@ public String docId;
     public String getUsername() {
         return username;
     }
-    public String getBookType() {
-        return bookType;
-    }
     public String getDescription() {
         return description;
-    }
-
-    public long getTime() {
-        return time;
     }
 }

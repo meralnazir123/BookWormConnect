@@ -51,7 +51,6 @@ dependencies {
     implementation("com.google.android.material:material:1.12.0")
     implementation(libs.room.common.jvm)
     implementation(libs.firebase.database)
-    implementation(libs.play.services.maps)
     testImplementation(libs.junit)
     androidTestImplementation(libs.ext.junit)
     androidTestImplementation(libs.espresso.core)
@@ -64,6 +63,5 @@ dependencies {
     implementation ("com.google.firebase:firebase-auth")
     implementation (libs.google.firebase.firestore)
     implementation (libs.google.firebase.storage)
-    implementation (libs.osmdroid.android)
     implementation(libs.okhttp)
 }

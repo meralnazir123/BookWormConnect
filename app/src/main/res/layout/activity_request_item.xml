@@ -10,20 +10,37 @@
         android:id="@+id/nameTv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:textStyle="bold" />
+        android:textStyle="bold"
+        android:textSize="15sp"/>
 
     <TextView
         android:id="@+id/addressTv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="10dp" />
+        android:layout_marginTop="10dp"
+        android:textSize="15sp"/>
 
     <TextView
         android:id="@+id/bookTv"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textColor="#FFFFFF"
-        android:textSize="13sp"/>
+        android:textSize="15sp"/>
+    <TextView
+        android:id="@+id/pickupDateTv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Pickup Date:"
+        android:textSize="15sp"
+        android:layout_marginTop="6dp" />
+
+    <TextView
+        android:id="@+id/pickupTimeTv"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:text="Pickup Time:"
+        android:textSize="15sp"
+        android:layout_marginTop="4dp" />
 
     <Button
         android:id="@+id/acceptBtn"
@@ -47,6 +64,7 @@
 
     <TextView
         android:id="@+id/statusTv"
+        android:textSize="15sp"
         android:layout_marginTop="10dp"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"/>

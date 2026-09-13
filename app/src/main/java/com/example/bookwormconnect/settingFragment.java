@@ -1,6 +1,8 @@
 package com.example.bookwormconnect;
 
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.Bundle;
 
 import androidx.appcompat.app.AlertDialog;
@@ -15,8 +17,12 @@ import android.widget.Toast;
 
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
+import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.firestore.DocumentSnapshot;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.firestore.WriteBatch;
 
 public class settingFragment extends Fragment {
 
@@ -27,6 +33,7 @@ public class settingFragment extends Fragment {
     FirebaseUser user;
 
     DatabaseReference settingsRef;
+    SharedPreferences settingsPrefs;
 
     public settingFragment() {
     }
@@ -50,29 +57,39 @@ public class settingFragment extends Fragment {
 
         mAuth = FirebaseAuth.getInstance();
         user = mAuth.getCurrentUser();
+        settingsPrefs = requireContext()
+                .getSharedPreferences("SettingsPrefs", Context.MODE_PRIVATE);
 
 
         if (user != null) {
 
             settingsRef = FirebaseDatabase.getInstance()
-                    .getReference("Users")
+                    .getReference("users")
                     .child(user.getUid())
                     .child("Settings");
 
             loadNotificationSetting();
         }
 
-        // NOTIFICATION SWITCH
         switchNotifications.setOnCheckedChangeListener((buttonView, isChecked) -> {
 
-            settingsRef.child("notificationsEnabled").setValue(isChecked);
+            if (settingsRef != null) {
 
-            Toast.makeText(requireContext(),
-                    "Settings Updated",
-                    Toast.LENGTH_SHORT).show();
+                settingsRef.child("notificationsEnabled")
+                        .setValue(isChecked);
+
+                settingsPrefs.edit()
+                        .putBoolean("notificationsEnabled", isChecked)
+                        .apply();
+
+                Toast.makeText(
+                        requireContext(),
+                        "Settings Updated",
+                        Toast.LENGTH_SHORT
+                ).show();
+            }
         });
 
-        // LOGOUT
         logoutLayout.setOnClickListener(v -> {
 
             mAuth.signOut();
@@ -87,7 +104,6 @@ public class settingFragment extends Fragment {
             requireActivity().finish();
         });
 
-        // DELETE ACCOUNT
         deleteAccountLayout.setOnClickListener(v -> {
 
             new AlertDialog.Builder(requireContext())
@@ -103,63 +119,182 @@ public class settingFragment extends Fragment {
 
     private void loadNotificationSetting() {
 
-        settingsRef.child("notificationsEnabled")
-                .get()
-                .addOnSuccessListener(snapshot -> {
+        boolean savedValue = settingsPrefs.getBoolean(
+                "notificationsEnabled",
+                true
+        );
 
-                    if (snapshot.exists()) {
+        switchNotifications.setOnCheckedChangeListener(null);
 
-                        Boolean enabled = snapshot.getValue(Boolean.class);
+        switchNotifications.setChecked(savedValue);
 
-                        if (enabled != null) {
+        switchNotifications.setOnCheckedChangeListener((buttonView, isChecked) -> {
 
-                            switchNotifications.setChecked(enabled);
+            if (settingsRef != null) {
+
+                settingsRef.child("notificationsEnabled")
+                        .setValue(isChecked);
+
+                settingsPrefs.edit()
+                        .putBoolean("notificationsEnabled", isChecked)
+                        .apply();
+
+                Toast.makeText(
+                        requireContext(),
+                        "Settings Updated",
+                        Toast.LENGTH_SHORT
+                ).show();
+            }
+        });
+
+        if (settingsRef != null) {
+
+            settingsRef.child("notificationsEnabled")
+                    .get()
+                    .addOnSuccessListener(snapshot -> {
+
+                        if (snapshot.exists()) {
+
+                            Boolean enabled =
+                                    snapshot.getValue(Boolean.class);
+
+                            if (enabled != null) {
+
+                                switchNotifications
+                                        .setOnCheckedChangeListener(null);
+
+                                switchNotifications.setChecked(enabled);
+
+                                settingsPrefs.edit()
+                                        .putBoolean(
+                                                "notificationsEnabled",
+                                                enabled
+                                        )
+                                        .apply();
+
+                                switchNotifications
+                                        .setOnCheckedChangeListener(
+                                                (buttonView, isChecked) -> {
+
+                                                    settingsRef
+                                                            .child("notificationsEnabled")
+                                                            .setValue(isChecked);
+
+                                                    settingsPrefs.edit()
+                                                            .putBoolean(
+                                                                    "notificationsEnabled",
+                                                                    isChecked
+                                                            )
+                                                            .apply();
+
+                                                    Toast.makeText(
+                                                            requireContext(),
+                                                            "Settings Updated",
+                                                            Toast.LENGTH_SHORT
+                                                    ).show();
+                                                }
+                                        );
+                            }
                         }
-                    }
-                });
+                    });
+        }
     }
-
     private void deleteAccount() {
+            FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
 
-        if (user == null)
-            return;
+            if (user == null) {
+                Toast.makeText(
+                        requireContext(),
+                        "No user logged in", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
-        String uid = user.getUid();
+            String uid = user.getUid();
 
-        // DELETE DATABASE DATA
-        FirebaseDatabase.getInstance()
-                .getReference("Users")
-                .child(uid)
-                .removeValue()
-                .addOnCompleteListener(task -> {
+            FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-                    // DELETE AUTH ACCOUNT
-                    user.delete()
-                            .addOnCompleteListener(task1 -> {
+            db.collection("posts")
+                    .whereEqualTo("userId", uid)
+                    .get()
+                    .addOnSuccessListener(querySnapshot -> {
 
-                                if (task1.isSuccessful()) {
+                        WriteBatch batch = db.batch();
 
-                                    Toast.makeText(requireContext(),
-                                            "Account Deleted",
-                                            Toast.LENGTH_SHORT).show();
+                        for (DocumentSnapshot document : querySnapshot.getDocuments()) {
+                            batch.delete(document.getReference());
+                        }
 
-                                    Intent intent = new Intent(requireContext(),
-                                            LoginActivity.class);
+                        batch.commit()
+                                .addOnSuccessListener(aVoid -> {
 
-                                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK |
-                                            Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    FirebaseDatabase.getInstance()
+                                            .getReference("users")
+                                            .child(uid)
+                                            .removeValue()
+                                            .addOnSuccessListener(unused -> {
 
-                                    startActivity(intent);
+                                                FirebaseDatabase.getInstance()
+                                                        .getReference("usernames")
+                                                        .orderByChild("uid")
+                                                        .equalTo(uid)
+                                                        .get()
+                                                        .addOnSuccessListener(usernameSnapshot -> {
 
-                                    requireActivity().finish();
+                                                            for (DataSnapshot snapshot :
+                                                                    usernameSnapshot.getChildren()) {
 
-                                } else {
+                                                                snapshot.getRef().removeValue();
+                                                            }
 
-                                    Toast.makeText(requireContext(),
-                                            task1.getException().getMessage(),
-                                            Toast.LENGTH_LONG).show();
-                                }
-                            });
-                });
+                                                            user.delete()
+                                                                    .addOnSuccessListener(unused2 -> {
+
+                                                                        Toast.makeText(
+                                                                                requireContext(),
+                                                                                "Account deleted successfully",
+                                                                                Toast.LENGTH_SHORT
+                                                                        ).show();
+
+                                                                        Intent intent =
+                                                                                new Intent(
+                                                                                       requireContext(),
+                                                                                        LoginActivity.class
+                                                                                );
+
+                                                                        intent.addFlags(
+                                                                                Intent.FLAG_ACTIVITY_NEW_TASK |
+                                                                                        Intent.FLAG_ACTIVITY_CLEAR_TASK
+                                                                        );
+
+                                                                        startActivity(intent);
+                                                                        requireActivity().finish();
+
+                                                                    })
+                                                                    .addOnFailureListener(e ->
+                                                                            Toast.makeText(
+                                                                                    requireContext(),
+                                                                                    "Account deletion failed: "
+                                                                                            + e.getMessage(),
+                                                                                    Toast.LENGTH_LONG
+                                                                            ).show()
+                                                                    );
+                                                        });
+                                            });
+                                })
+                                .addOnFailureListener(e ->
+                                        Toast.makeText(
+                                                requireContext(),
+                                                "Failed to delete posts: " + e.getMessage(),
+                                                Toast.LENGTH_LONG
+                                        ).show()
+                                );
+                    })
+                    .addOnFailureListener(e ->
+                            Toast.makeText(
+                                    requireContext(),
+                                    "Failed to find user's posts: " + e.getMessage(),
+                                    Toast.LENGTH_LONG
+                            ).show()
+                    );
+        }
     }
-}

@@ -49,6 +49,17 @@ public class requestAdapter extends RecyclerView.Adapter<requestAdapter.ViewHold
         }
         holder.statusTv.setText(request.status);
         holder.bookTv.setText(request.bookDescription);
+        holder.pickupDateTv.setText(
+                request.requestedPickupDate != null
+                        ? "Pickup Date: " + request.requestedPickupDate
+                        : "Pickup Date: Not selected"
+        );
+
+        holder.pickupTimeTv.setText(
+                request.requestedPickupTime != null
+                        ? "Pickup Time: " + request.requestedPickupTime
+                        : "Pickup Time: Not selected"
+        );
 
         holder.addressTv.setText(
                 request.address != null ? "Address: " + request.address : "No Address"
@@ -158,6 +169,7 @@ public class requestAdapter extends RecyclerView.Adapter<requestAdapter.ViewHold
         TextView nameTv, addressTv,statusTv;
         TextView bookTv;
         Button acceptBtn, declineBtn;
+        TextView pickupDateTv, pickupTimeTv;
 
         public ViewHolder(@NonNull View itemView) {
             super(itemView);
@@ -167,6 +179,8 @@ public class requestAdapter extends RecyclerView.Adapter<requestAdapter.ViewHold
             addressTv = itemView.findViewById(R.id.addressTv);
             acceptBtn = itemView.findViewById(R.id.acceptBtn);
             declineBtn = itemView.findViewById(R.id.declineBtn);
+            pickupDateTv = itemView.findViewById(R.id.pickupDateTv);
+            pickupTimeTv = itemView.findViewById(R.id.pickupTimeTv);
         }
     }
 }

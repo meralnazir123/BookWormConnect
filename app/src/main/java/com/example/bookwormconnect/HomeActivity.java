@@ -12,6 +12,7 @@ import android.widget.Toast;
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.SearchView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.activity.EdgeToEdge;
@@ -26,6 +27,7 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.navigation.NavigationView;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.Query;
@@ -113,7 +115,7 @@ public class HomeActivity extends AppCompatActivity {
         MenuItem adminItem = navigationView.getMenu().findItem(R.id.admin);
 
         if (currentUserId != null &&
-                currentUserId.equals("8irufe7ft4PmqWvUBxMWeH7Y9oI3")) {
+                currentUserId.equals("21fLX4JQh5Rvic4kNEdZgHM38ih2")) {
 
             adminItem.setVisible(true);
 
@@ -153,7 +155,10 @@ public class HomeActivity extends AppCompatActivity {
                     startActivity(intent);
                 } else if (id == R.id.MyBooks) {
                     loadFragment(new MybooksFragment());
-                } else if (id == R.id.novels) {
+                }
+                else if (item.getItemId() == R.id.cat) {
+                    return false;
+                }else if (id == R.id.novels) {
                     fragment = CategoriesFragment.newInstance("Novel");
                 } else if (id == R.id.textbooks) {
                     fragment = CategoriesFragment.newInstance("Text Book");
@@ -173,7 +178,11 @@ public class HomeActivity extends AppCompatActivity {
                 } else if (id == R.id.request) {
                     Intent intent = new Intent(HomeActivity.this, requestActivity.class);
                     startActivity(intent);
-                } else if (id == R.id.post) {
+                }
+                else if (id == R.id.about) {
+                    Intent intent = new Intent(HomeActivity.this, AboutActivity.class);
+                    startActivity(intent);
+                }else if (id == R.id.post) {
                     if (checkSelfPermission(android.Manifest.permission.CAMERA)
                             == PackageManager.PERMISSION_GRANTED) {
                         openCameraChooser();
@@ -186,12 +195,32 @@ public class HomeActivity extends AppCompatActivity {
                     Intent intent = new Intent(HomeActivity.this, AdminActivity.class);
                     startActivity(intent);
                 } else if (id == R.id.logout) {
-                    FirebaseAuth.getInstance().signOut();
-                    Intent intent = new Intent(HomeActivity.this, LoginActivity.class);
-                    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                    startActivity(intent);
-                    finish();
-                }
+
+                new AlertDialog.Builder(HomeActivity.this)
+                        .setTitle("Logout")
+                        .setMessage("Are you sure you want to logout?")
+                        .setPositiveButton("Yes", (dialog, which) -> {
+
+                            FirebaseAuth.getInstance().signOut();
+
+                            Intent intent = new Intent(
+                                    HomeActivity.this,
+                                    LoginActivity.class
+                            );
+
+                            intent.setFlags(
+                                    Intent.FLAG_ACTIVITY_NEW_TASK |
+                                            Intent.FLAG_ACTIVITY_CLEAR_TASK
+                            );
+
+                            startActivity(intent);
+                            finish();
+                        })
+                        .setNegativeButton("No", (dialog, which) -> {
+                            dialog.dismiss();
+                        })
+                        .show();
+            }
                 if (fragment != null) {
                     FrameLayout frame = findViewById(R.id.frame);
 
@@ -255,45 +284,64 @@ public class HomeActivity extends AppCompatActivity {
         String uid = FirebaseAuth.getInstance().getUid();
 
         if (uid == null) {
-            Toast.makeText(this, "User not logged in", Toast.LENGTH_SHORT).show();
+            Toast.makeText(
+                    this,
+                    "User not logged in",
+                    Toast.LENGTH_SHORT
+            ).show();
             return;
         }
 
-        FirebaseFirestore.getInstance()
-                .collection("users")
-                .document(uid)
+        FirebaseDatabase.getInstance()
+                .getReference("users")
+                .child(uid)
                 .get()
-                .addOnSuccessListener(documentSnapshot -> {
+                .addOnSuccessListener(snapshot -> {
 
-                    if (documentSnapshot.exists()) {
+                    if (snapshot.exists()) {
 
-                        String username = documentSnapshot.getString("username");
+                        String username =
+                                snapshot.child("username")
+                                        .getValue(String.class);
 
-                        if (username != null) {
+                        if (username != null &&
+                                !username.isEmpty()) {
 
                             TempPostHolder.username = username;
                             TempPostHolder.bitmap = bitmap;
 
-                            startActivity(new Intent(HomeActivity.this,
-                                    PostDetailActivity.class));
+                            startActivity(
+                                    new Intent(
+                                            HomeActivity.this,
+                                            PostDetailActivity.class
+                                    )
+                            );
 
                         } else {
-                            Toast.makeText(this,
-                                    "Username field missing",
-                                    Toast.LENGTH_SHORT).show();
+
+                            Toast.makeText(
+                                    this,
+                                    "Username not found",
+                                    Toast.LENGTH_SHORT
+                            ).show();
                         }
 
                     } else {
-                        Toast.makeText(this,
+
+                        Toast.makeText(
+                                this,
                                 "User record not found",
-                                Toast.LENGTH_SHORT).show();
+                                Toast.LENGTH_SHORT
+                        ).show();
                     }
 
                 })
                 .addOnFailureListener(e ->
-                        Toast.makeText(this,
-                                e.getMessage(),
-                                Toast.LENGTH_SHORT).show()
+                        Toast.makeText(
+                                this,
+                                "Failed to load user: " + e.getMessage(),
+                                Toast.LENGTH_SHORT
+                        ).show()
                 );
     }
 
@@ -320,8 +368,6 @@ public class HomeActivity extends AppCompatActivity {
                                 "Failed to load posts",
                                 Toast.LENGTH_SHORT).show());
     }
-
-
     @Override
     public void onBackPressed() {
 

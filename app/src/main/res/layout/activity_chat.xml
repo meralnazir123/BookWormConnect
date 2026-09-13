@@ -8,45 +8,48 @@
     android:layout_marginTop="10dp"
     android:layout_height="match_parent">
 
-    <LinearLayout
+    <RelativeLayout
         android:layout_width="match_parent"
-        android:layout_height="70dp"
-        android:orientation="horizontal"
-        android:gravity="center_vertical"
-        android:padding="12dp">
+        android:layout_height="60dp"
+        android:padding="8dp">
 
         <ImageView
             android:id="@+id/imgChatProfile"
             android:layout_width="45dp"
             android:layout_height="45dp"
+            android:layout_centerVertical="true"
             android:src="@drawable/user"
-            android:scaleType="centerCrop"/>
+            android:scaleType="centerCrop" />
 
         <TextView
             android:id="@+id/chatUsername"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_centerVertical="true"
+            android:layout_toEndOf="@id/imgChatProfile"
             android:layout_marginStart="12dp"
             android:text="Username"
             android:textSize="20sp"
-            android:textStyle="bold"/>
+            android:textStyle="bold" />
 
         <ImageButton
-            android:id="@+id/Deposit"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:layout_marginLeft="120dp"
-            android:src="@drawable/deposit"
-            tools:ignore="SpeakableTextPresentCheck" />
+            android:id="@+id/btnMore"
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:background="@android:color/transparent"
+            android:src="@drawable/more"
+            android:padding="8dp"
+            android:contentDescription="More options" />
 
-        <ImageButton
-            android:id="@+id/btnCamera"
-            android:layout_width="60dp"
-            android:layout_height="60dp"
-            android:src="@android:drawable/ic_menu_camera"
-            tools:ignore="SpeakableTextPresentCheck" />
+    </RelativeLayout>
 
-    </LinearLayout>
+<LinearLayout
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:background="@drawable/background1">
 
     <TextView
         android:id="@+id/txtAddress"
@@ -54,6 +57,7 @@
         android:layout_height="wrap_content"
         android:text="Address"
         android:textSize="15sp"
+        android:textStyle="bold"
         android:layout_marginLeft="10dp"
         android:layout_marginTop="2dp"/>
 
@@ -67,13 +71,14 @@
         android:layout_marginStart="10dp"
         android:layout_marginTop="6dp"
         android:layout_marginBottom="4dp"/>
+
     <androidx.recyclerview.widget.RecyclerView
         android:id="@+id/chatRecycler"
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"/>
-
     <HorizontalScrollView
+        android:id="@+id/messageOptions"
         android:layout_width="match_parent"
         android:layout_height="wrap_content">
 
@@ -83,26 +88,78 @@
             android:orientation="horizontal">
 
             <Button
+                android:id="@+id/btnHi"
+                android:backgroundTint="#fff3c2"
+                android:textColor="@color/black"
+                android:text="Hi."
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"/>
+
+            <Button
                 android:id="@+id/btnAvailable"
+                android:backgroundTint="#fff3c2"
+                android:textColor="@color/black"
                 android:text="Is this book available?"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 
             <Button
                 android:id="@+id/btnMeet"
+                android:backgroundTint="#fff3c2"
+                android:textColor="@color/black"
                 android:text="When can we meet?"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"/>
 
             <Button
                 android:id="@+id/btnDeposit"
+                android:backgroundTint="#fff3c2"
+                android:textColor="@color/black"
                 android:text="I have sent the deposit."
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginBottom="10dp"/>
+            <Button
+                android:id="@+id/btnreturnbook"
+                android:backgroundTint="#fff3c2"
+                android:textColor="@color/black"
+                android:text="I have return the book."
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"/>
+
+            <Button
+                android:id="@+id/btnreceivedbook"
+                android:backgroundTint="#fff3c2"
+                android:textColor="@color/black"
+                android:text="I have received the book."
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"/>
+            <Button
+                android:id="@+id/btngiftbook"
+                android:backgroundTint="#fff3c2"
+                android:textColor="@color/black"
+                android:text="I want to gift this book."
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"/>
+
+            <Button
+                android:id="@+id/btnN"
+                android:backgroundTint="#fff3c2"
+                android:textColor="@color/black"
+                android:text="No."
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginBottom="10dp"/>
+
 
         </LinearLayout>
 
     </HorizontalScrollView>
+
+</LinearLayout>
 
 </LinearLayout>

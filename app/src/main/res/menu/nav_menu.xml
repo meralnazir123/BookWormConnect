@@ -38,33 +38,28 @@
         android:title="Requests"
         />
 
-    <item
-        android:id="@+id/divider1"
-        android:enabled="false"
-        app:actionLayout="@layout/divider"
-        tools:ignore="MenuTitle">
 
-    </item>
     <item
         android:id="@+id/cat"
-        android:icon="@drawable/categories"
-        android:title="Categories"/>
+        android:title="Categories"
+        android:icon="@drawable/categories" />
 
-            <item
-                android:id="@+id/novels"
-                android:title="Novels"/>
+    <group
+        android:id="@+id/category_group"
+        android:checkableBehavior="single">
 
-            <item
-                android:id="@+id/textbooks"
-                android:title="TextBooks"
-                />
-    <item
-        android:id="@+id/divider2"
-        android:enabled="false"
-        app:actionLayout="@layout/divider"
-        tools:ignore="MenuTitle">
+        <item
+            android:id="@+id/novels"
+            android:title="Novels"
+            />
 
-    </item>
+        <item
+            android:id="@+id/textbooks"
+            android:title="TextBooks"
+             />
+
+    </group>
+
     <item
         android:id="@+id/setting"
         android:icon="@drawable/setting"
@@ -79,5 +74,11 @@
         android:id="@+id/admin"
         android:icon="@drawable/request"
         android:title="Admin"
+        />
+
+    <item
+        android:id="@+id/about"
+        android:icon="@drawable/about"
+        android:title="About"
         />
 </menu>

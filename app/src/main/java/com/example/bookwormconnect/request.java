@@ -15,6 +15,9 @@ public class request {
     public String chatId;
     public String postId;
 
+    // NEW
+    public String postId;
+
     public request() {
     }
 

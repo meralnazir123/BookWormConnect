@@ -16,21 +16,12 @@ import java.util.List;
 
 import de.hdodenhof.circleimageview.CircleImageView;
 
-/**
- * UserAdapter — shows a list of users in the chat list screen.
- * Clicking a user opens ChatActivity with the correct chatId and requestId.
- *
- * Layout used: res/layout/row_users.xml  (created below)
- *
- * Fields read from UserModel:
- *   uid, username, profilepic, requestId
- */
 public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder> {
 
-    private final Context       context;
-    private final List<UserModel> userList;
+    private final Context           context;
+    private final List<UserModel>   userList;
 
-    public UserAdapter(Context context, List<UserModel> userList) {
+    public UserAdapter(@NonNull Context context, @NonNull List<UserModel> userList) {
         this.context  = context;
         this.userList = userList;
     }
@@ -38,9 +29,8 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     @NonNull
     @Override
     public UserViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        // ✅ Use parent.getContext() — NOT ChatActivity directly
         View view = LayoutInflater.from(parent.getContext())
-                .inflate(R.layout.row_users, parent, false);
+                .inflate(R.layout.activity_row_users, parent, false);
         return new UserViewHolder(view);
     }
 
@@ -48,12 +38,10 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
     public void onBindViewHolder(@NonNull UserViewHolder holder, int position) {
         UserModel user = userList.get(position);
 
-        // Set username
         holder.tvUsername.setText(
                 user.getUsername() != null ? user.getUsername() : "Unknown User"
         );
 
-        // Load profile picture with Glide
         if (user.getProfilepic() != null && !user.getProfilepic().isEmpty()) {
             Glide.with(context)
                     .load(user.getProfilepic())
@@ -63,7 +51,6 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
             holder.profileImage.setImageResource(R.drawable.user);
         }
 
-        // ✅ On click — open ChatActivity (NOT chatwin)
         holder.itemView.setOnClickListener(v -> {
             Intent intent = new Intent(context, ChatActivity.class);
             intent.putExtra("chatId",    user.getChatId());
@@ -77,12 +64,11 @@ public class UserAdapter extends RecyclerView.Adapter<UserAdapter.UserViewHolder
         return userList != null ? userList.size() : 0;
     }
 
-    // ── ViewHolder ─────────────────────────────────────────────────────
-    static class UserViewHolder extends RecyclerView.ViewHolder {
-        CircleImageView profileImage;
-        TextView        tvUsername;
+    static final class UserViewHolder extends RecyclerView.ViewHolder {
+        private final CircleImageView profileImage;
+        private final TextView        tvUsername;
 
-        UserViewHolder(@NonNull View itemView) {
+        private UserViewHolder(@NonNull View itemView) {
             super(itemView);
             profileImage = itemView.findViewById(R.id.profileImage);
             tvUsername   = itemView.findViewById(R.id.tvUsername);

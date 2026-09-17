@@ -1,17 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!--
-    strings.xml — REPLACE existing file
-    Place in: app/src/main/res/values/strings.xml
-    Added: chat screen string resources to fix hardcoded text warnings
--->
 <resources>
     <string name="app_name">BookWormConnect</string>
     <string name="bio">here and there i am using my social</string>
     <string name="open_nav">Open Nav drawer</string>
     <string name="close_nav">Close nav drawer</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
-
-    <!-- ── Chat screen strings (fixes hardcoded text warnings) ───────── -->
     <string name="hint_type_message">Type a message…</string>
     <string name="cd_send_button">Send message</string>
     <string name="cd_chat_messages">Chat messages</string>

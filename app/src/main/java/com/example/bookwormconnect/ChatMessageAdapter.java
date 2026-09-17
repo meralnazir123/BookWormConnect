@@ -14,16 +14,7 @@ import java.text.SimpleDateFormat;
 import java.util.List;
 import java.util.Locale;
 
-/**
- * ChatMessageAdapter — renders chat bubbles in the RecyclerView.
- *
- * View types:
- *   TYPE_SENT     (0) — messages sent by the current user (right-aligned)
- *   TYPE_RECEIVED (1) — messages from the other user (left-aligned)
- *
- * Uses item_chat_message.xml for both types; gravity / colors are
- * set programmatically based on the sender.
- */
+
 public class ChatMessageAdapter
         extends RecyclerView.Adapter<ChatMessageAdapter.MessageViewHolder> {
 
@@ -62,14 +53,12 @@ public class ChatMessageAdapter
 
         holder.tvMessage.setText(msg.getText());
 
-        // Timestamp
         if (msg.getTimestamp() != null) {
             holder.tvTime.setText(TIME_FMT.format(msg.getTimestamp()));
         } else {
             holder.tvTime.setText("");
         }
 
-        // Tag label (predefined vs custom)
         if (msg.isQuestion()) {
             holder.tvTag.setVisibility(View.VISIBLE);
             holder.tvTag.setText("❓ Question");
@@ -80,7 +69,6 @@ public class ChatMessageAdapter
             holder.tvTag.setVisibility(View.GONE);
         }
 
-        // Align bubble: sent → right, received → left
         LinearLayout.LayoutParams params =
                 (LinearLayout.LayoutParams) holder.bubbleContainer.getLayoutParams();
 
@@ -99,14 +87,12 @@ public class ChatMessageAdapter
         }
         holder.bubbleContainer.setLayoutParams(params);
 
-        // Outer row alignment
         holder.rowContainer.setGravity(isSent ? Gravity.END : Gravity.START);
     }
 
     @Override
     public int getItemCount() { return messages.size(); }
 
-    // ── ViewHolder ─────────────────────────────────────────────────────
     static class MessageViewHolder extends RecyclerView.ViewHolder {
         LinearLayout rowContainer;
         LinearLayout bubbleContainer;

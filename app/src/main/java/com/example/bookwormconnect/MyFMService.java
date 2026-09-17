@@ -15,27 +15,16 @@ import com.google.firebase.messaging.RemoteMessage;
 
 import java.util.Map;
 
-/**
- * MyFMService — Firebase Cloud Messaging Service (updated)
- *
- * Enhancements over the original:
- *  • Extracts chatId, requestId, bookTitle from data payload
- *  • Tapping the notification opens ChatActivity with the correct chat
- *  • Uses a dedicated CHAT notification channel with high priority
- *  • Updates the FCM token in Firestore whenever it rotates
- */
 public class MyFMService extends FirebaseMessagingService {
 
     private static final String CHANNEL_ID   = "bookworm_chat_channel";
     private static final String CHANNEL_NAME = "BookWorm Chat Messages";
 
-    // ── Called when a push arrives ─────────────────────────────────────
     @Override
     public void onMessageReceived(@NonNull RemoteMessage message) {
         String title = "BookWormConnect";
         String body  = "You have a new message";
 
-        // Notification payload (when app is in foreground)
         if (message.getNotification() != null) {
             if (message.getNotification().getTitle() != null)
                 title = message.getNotification().getTitle();
@@ -43,7 +32,6 @@ public class MyFMService extends FirebaseMessagingService {
                 body  = message.getNotification().getBody();
         }
 
-        // Data payload — carries chatId, requestId, bookTitle
         Map<String, String> data = message.getData();
         String chatId    = data.get("chatId");
         String requestId = data.get("requestId");
@@ -52,11 +40,10 @@ public class MyFMService extends FirebaseMessagingService {
         showChatNotification(title, body, chatId, requestId, bookTitle);
     }
 
-    // ── Called when the FCM token is refreshed ─────────────────────────
     @Override
     public void onNewToken(@NonNull String token) {
         super.onNewToken(token);
-        // Persist the new token to Firestore so other users can reach this device
+
         com.google.firebase.auth.FirebaseAuth auth =
                 com.google.firebase.auth.FirebaseAuth.getInstance();
         if (auth.getUid() != null) {
@@ -67,14 +54,12 @@ public class MyFMService extends FirebaseMessagingService {
         }
     }
 
-    // ── Build and show the notification ───────────────────────────────
     private void showChatNotification(String title, String body,
                                       String chatId, String requestId,
                                       String bookTitle) {
         NotificationManager manager =
                 (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
 
-        // Create channel (required on API 26+)
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
             NotificationChannel channel = new NotificationChannel(
                     CHANNEL_ID,
@@ -87,7 +72,6 @@ public class MyFMService extends FirebaseMessagingService {
             manager.createNotificationChannel(channel);
         }
 
-        // Deep-link intent → opens ChatActivity with the right chat
         Intent intent = new Intent(this, ChatActivity.class);
         intent.putExtra("chatId",    chatId);
         intent.putExtra("requestId", requestId);
@@ -102,7 +86,6 @@ public class MyFMService extends FirebaseMessagingService {
                         | PendingIntent.FLAG_IMMUTABLE
         );
 
-        // Build the notification
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(this, CHANNEL_ID)
                         .setSmallIcon(R.drawable.books)
@@ -113,7 +96,6 @@ public class MyFMService extends FirebaseMessagingService {
                         .setPriority(NotificationCompat.PRIORITY_HIGH)
                         .setContentIntent(pendingIntent);
 
-        // Use unique ID so multiple notifications don't overwrite each other
         int notifId = (chatId != null) ? chatId.hashCode()
                 : (int) System.currentTimeMillis();
         manager.notify(notifId, builder.build());

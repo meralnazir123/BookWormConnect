@@ -52,23 +52,20 @@ import okhttp3.Response;
 
 public class ChatActivity extends AppCompatActivity {
 
-    // ── Views ──────────────────────────────────────────────────────────
     private Toolbar toolbar;
     private RecyclerView recyclerView;
-    private ChipGroup chipGroupQuestions;   // sender's question chips
-    private ChipGroup chipGroupAnswers;     // receiver's answer chips
+    private ChipGroup chipGroupQuestions;
+    private ChipGroup chipGroupAnswers;
     private HorizontalScrollView scrollQuestions;
     private HorizontalScrollView scrollAnswers;
     private EditText editTextCustomMessage;
     private ImageButton btnSend;
     private ProgressBar progressBar;
     private TextView tvChipLabel;
-
-    // ── Data ───────────────────────────────────────────────────────────
     private String chatId, requestId;
     private String currentUserId;
-    private String senderId;        // the original request creator
-    private String ownerId;         // the book owner
+    private String senderId;
+    private String ownerId;
     private String bookTitle  = "";
     private String bookGenre  = "General";
     private boolean isSender  = false;
@@ -78,20 +75,15 @@ public class ChatActivity extends AppCompatActivity {
 
     private ListenerRegistration messagesListener;
 
-    // ── Firebase ───────────────────────────────────────────────────────
     private final FirebaseFirestore db   = FirebaseFirestore.getInstance();
     private final FirebaseAuth      auth = FirebaseAuth.getInstance();
     private final OkHttpClient      http = new OkHttpClient();
 
-    // ── FCM endpoint (Server-side token approach via OkHttp) ───────────
-    // Replace YOUR_SERVER_KEY with the value from Firebase Console →
-    // Project Settings → Cloud Messaging → Server key
     private static final String FCM_URL    =
             "https://fcm.googleapis.com/fcm/send";
     private static final String SERVER_KEY =
-            "YOUR_SERVER_KEY";   // ← replace
+            "YOUR_SERVER_KEY";
 
-    // ── Predefined questions per genre (hardcoded fallback) ────────────
     private static final Map<String, List<String>> GENRE_QUESTIONS = new HashMap<>();
     static {
         GENRE_QUESTIONS.put("Fiction", Arrays.asList(
@@ -137,7 +129,6 @@ public class ChatActivity extends AppCompatActivity {
         ));
     }
 
-    // ── Predefined answers keyed by simplified question text ───────────
     private static final Map<String, List<String>> QUESTION_ANSWERS = new HashMap<>();
     static {
         QUESTION_ANSWERS.put("is this book still available", Arrays.asList(
@@ -185,7 +176,6 @@ public class ChatActivity extends AppCompatActivity {
         ));
     }
 
-    // ──────────────────────────────────────────────────────────────────
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -202,7 +192,6 @@ public class ChatActivity extends AppCompatActivity {
         checkChatEnabled();
     }
 
-    // ── Bind views ─────────────────────────────────────────────────────
     private void bindViews() {
         toolbar              = findViewById(R.id.chatToolbar);
         recyclerView         = findViewById(R.id.chatRecyclerView);
@@ -233,7 +222,6 @@ public class ChatActivity extends AppCompatActivity {
         recyclerView.setAdapter(adapter);
     }
 
-    // ── Step 1: verify chat is enabled ─────────────────────────────────
     private void checkChatEnabled() {
         progressBar.setVisibility(View.VISIBLE);
 
@@ -253,7 +241,6 @@ public class ChatActivity extends AppCompatActivity {
 
                         isSender = currentUserId.equals(senderId);
 
-                        // Update toolbar with book title
                         if (getSupportActionBar() != null)
                             getSupportActionBar().setTitle(bookTitle);
 
@@ -272,7 +259,6 @@ public class ChatActivity extends AppCompatActivity {
                 });
     }
 
-    // ── Step 2: load predefined chips from Firestore (or fallback) ─────
     private void loadPredefinedChips() {
         // Try to load dynamic questions from Firestore first
         db.collection("book_questions")
@@ -293,8 +279,7 @@ public class ChatActivity extends AppCompatActivity {
                     if (isSender) {
                         showQuestionChips(questions);
                     }
-                    // Receiver chips shown after sender selects a question
-                    // (see onQuestionChipSelected)
+
                 })
                 .addOnFailureListener(e ->
                         showQuestionChips(
@@ -302,7 +287,6 @@ public class ChatActivity extends AppCompatActivity {
                                         GENRE_QUESTIONS.get("General"))));
     }
 
-    /** Populate the SENDER question chips */
     private void showQuestionChips(List<String> questions) {
         chipGroupQuestions.removeAllViews();
         scrollQuestions.setVisibility(isSender ? View.VISIBLE : View.GONE);
@@ -323,19 +307,14 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
-    /** When sender taps a question chip → send it, then show receiver answer chips */
     private void onQuestionChipSelected(String questionText) {
         sendMessage(questionText, "predefined_question");
-        // If current user is receiver, show their answers
-        // (In a real scenario, the RECEIVER sees answer chips upon receiving a question)
-        // Here we also show answers on sender side for demo; remove if not needed
+
     }
 
-    /** Populate the RECEIVER answer chips based on the question received */
     private void showAnswerChips(String questionText) {
         chipGroupAnswers.removeAllViews();
 
-        // Check Firestore for dynamic answers first
         String questionKey = questionText.toLowerCase().replaceAll("[^a-z0-9 ]", "").trim();
 
         db.collection("book_answers")
@@ -383,7 +362,6 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
-    // ── Step 3: real-time message listener ─────────────────────────────
     private void listenForMessages() {
         messagesListener = db.collection("chats")
                 .document(chatId)
@@ -401,7 +379,6 @@ public class ChatActivity extends AppCompatActivity {
                             msg.setMessageId(doc.getId());
                             messageList.add(msg);
 
-                            // Track last question sent by sender
                             if ("predefined_question".equals(msg.getType())
                                     && senderId.equals(msg.getSenderId())) {
                                 lastSenderQuestion = msg.getText();
@@ -413,9 +390,7 @@ public class ChatActivity extends AppCompatActivity {
                     if (!messageList.isEmpty())
                         recyclerView.scrollToPosition(messageList.size() - 1);
 
-                    // Show answer chips for receiver when there's a new question
                     if (!isSender && lastSenderQuestion != null) {
-                        // Only show if the last message is a question (not answered yet)
                         ChatMessage lastMsg = messageList.get(messageList.size() - 1);
                         if ("predefined_question".equals(lastMsg.getType())
                                 && senderId.equals(lastMsg.getSenderId())) {
@@ -425,7 +400,6 @@ public class ChatActivity extends AppCompatActivity {
                 });
     }
 
-    // ── Step 4: send button (custom text) ──────────────────────────────
     private void setupSendButton() {
         btnSend.setOnClickListener(v -> {
             String text = editTextCustomMessage.getText().toString().trim();
@@ -438,14 +412,13 @@ public class ChatActivity extends AppCompatActivity {
         });
     }
 
-    // ── Core: write message to Firestore + trigger notification ────────
     private void sendMessage(String text, String type) {
         if (chatId == null) return;
 
         Map<String, Object> msg = new HashMap<>();
         msg.put("senderId",  currentUserId);
         msg.put("text",      text);
-        msg.put("type",      type);               // predefined_question / predefined_answer / custom
+        msg.put("type",      type);
         msg.put("timestamp", FieldValue.serverTimestamp());
 
         db.collection("chats")
@@ -457,7 +430,6 @@ public class ChatActivity extends AppCompatActivity {
                         Toast.makeText(this, "Send failed", Toast.LENGTH_SHORT).show());
     }
 
-    // ── Push notification to the OTHER user ────────────────────────────
     private void sendPushNotification(String messageText) {
         // Determine the recipient's UID
         String recipientUid = isSender ? ownerId : senderId;
@@ -483,10 +455,6 @@ public class ChatActivity extends AppCompatActivity {
                 });
     }
 
-    /**
-     * Sends FCM notification via OkHttp (legacy HTTP API).
-     * Replace with FCM v1 / Cloud Functions if needed.
-     */
     private void dispatchFcmNotification(String token, String senderName, String body) {
         try {
             JSONObject notification = new JSONObject();
@@ -519,7 +487,7 @@ public class ChatActivity extends AppCompatActivity {
 
             http.newCall(request).enqueue(new Callback() {
                 @Override public void onFailure(Call call, java.io.IOException e) {
-                    // Silent — notification delivery failure shouldn't disrupt UX
+
                 }
                 @Override public void onResponse(Call call, Response response) {
                     response.close();
@@ -530,7 +498,6 @@ public class ChatActivity extends AppCompatActivity {
         }
     }
 
-    // ── Lifecycle ──────────────────────────────────────────────────────
     @Override
     protected void onDestroy() {
         super.onDestroy();
